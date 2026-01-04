@@ -162,7 +162,7 @@ body {
 .search-result-item:hover, .search-result-item.selected {
     background: rgba(255,255,255,0.08); 
     border-left: 3px solid var(--color-electric-green);
-    padding-left: 12px;
+    padding-left: 12px; /* compensate for border */
 }
 .search-result-item.selected .search-icon-box { color: var(--color-electric-green); background: rgba(0,255,157,0.1); }
 

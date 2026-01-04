@@ -853,6 +853,392 @@ function renderFeed() {
     if(window.lucide) window.lucide.createIcons();
 }
 
+function getTagIcon(tag) {
+    if(tag === 'ai') return 'cpu';
+    if(tag === 'energy') return 'zap';
+    if(tag === 'policy') return 'scale';
+    if(tag === 'realestate') return 'building';
+    return 'tag';
+}
+
+async function toggleAnalysis(id) {
+    const el = document.getElementById(`ai-${id}`);
+    const article = appState.articles.find(a => a.id === id);
+    if (el.classList.contains('visible')) { el.classList.remove('visible'); } 
+    else { 
+        el.classList.add('visible');
+        if (!article.aiAnalysis || article.aiAnalysis === 'loading') {
+            article.aiAnalysis = 'loading';
+            const analysis = await performGeminiAnalysis(article);
+            article.aiAnalysis = analysis;
+            el.innerHTML = analysis;
+        } else { el.innerHTML = article.aiAnalysis; }
+    }
+}
+
+function speakText(text, btn) {
+    if ('speechSynthesis' in window) {
+        if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); btn.classList.remove('speaking'); return; }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.1; utterance.pitch = 1;
+        utterance.onend = () => btn.classList.remove('speaking');
+        btn.classList.add('speaking');
+        window.speechSynthesis.speak(utterance);
+    } else { showNotification("TTS Not Supported", "error"); }
+}
+
+function shareArticle(url) {
+    navigator.clipboard.writeText(url).then(() => { showNotification("Link Copied", "success"); }).catch(err => console.error(err));
+}
+
+window.toggleBookmark = function(id) {
+    const index = appState.savedArticles.indexOf(id);
+    if (index === -1) { appState.savedArticles.push(id); showNotification("Article Saved", "success"); } 
+    else { appState.savedArticles.splice(index, 1); showNotification("Article Removed", "info"); }
+    localStorage.setItem('nexus_saved', JSON.stringify(appState.savedArticles));
+    refreshUIComponents();
+};
+
+function updateQuickSaved() {
+    const container = document.getElementById('quickSavedList');
+    const btn = document.getElementById('downloadBriefBtn');
+    const savedArts = appState.articles.filter(a => appState.savedArticles.includes(a.id));
+    if (savedArts.length === 0) { container.innerHTML = '<span style="color: var(--color-text-muted); font-style: italic; font-size:0.8rem;">No bookmarks yet.</span>'; btn.style.display = 'none'; return; }
+    btn.style.display = 'block';
+    container.innerHTML = savedArts.slice(0, 5).map(a => `<div style="padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="openReader('${a.id}')"><div style="font-weight: 500; color: var(--color-text-secondary); font-size:0.85rem;">${a.title.substring(0, 40)}...</div><div style="font-size: 0.7rem; color: var(--color-text-muted);">${a.source}</div></div>`).join('');
+}
+
+function checkBreakingNews() {
+    const banner = document.getElementById('breakingBanner');
+    const breakingArt = appState.articles.find(a => a.impact === 'high');
+    if (breakingArt && appState.settings.breakingNews) {
+        document.getElementById('breakingText').innerText = "BREAKING: " + breakingArt.title.toUpperCase();
+        banner.style.display = 'flex';
+        banner.onclick = () => { window.open(breakingArt.url, '_blank'); };
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+function initMap() {
+    if(appState.map) return;
+    const mapEl = document.getElementById('miniMap');
+    if(!mapEl) return;
+    appState.map = L.map('miniMap', { center: [30, -10], zoom: 1.5, zoomControl: false, attributionControl: false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd' }).addTo(appState.map);
+}
+
+function updateMapMarkers() {
+    if(!appState.map) return;
+    Object.values(appState.markers).forEach(m => appState.map.removeLayer(m));
+    appState.markers = {};
+    
+    let visibleArticles = appState.articles;
+    visibleArticles.forEach(art => {
+        const customIcon = L.divIcon({ className: 'custom-map-icon', html: `<div class="map-marker-pulse ${art.tag} ${art.impact === 'high' ? 'high-impact' : ''}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+        const marker = L.marker([art.lat, art.lng], { icon: customIcon }).addTo(appState.map);
+        marker.bindPopup(`<div style="font-family: Inter, sans-serif; color: #eee;"><strong style="display:block; margin-bottom: 4px; font-size:0.9rem;">${art.title}</strong><span style="font-size: 0.75rem; color: #aaa; text-transform:uppercase;">${art.source}</span></div>`);
+        marker.on('click', () => { const card = document.getElementById(art.id); if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('highlight-card'); setTimeout(() => card.classList.remove('highlight-card'), 2000); } });
+        appState.markers[art.id] = marker; 
+    });
+}
+
+function highlightMapMarker(id) { const marker = appState.markers[id]; if (marker) marker.openPopup(); }
+function unhighlightMapMarker(id) { const marker = appState.markers[id]; if (marker) marker.closePopup(); }
+
+function applySettings() {
+    if (appState.settings.cyberpunk) { document.body.classList.add('cyberpunk-active'); document.querySelectorAll('.scanlines, .crt-flicker, .glow-overlay').forEach(el => el.style.display = 'block'); document.getElementById('cyberpunkToggle').checked = true; } 
+    else { document.body.classList.remove('cyberpunk-active'); document.querySelectorAll('.scanlines, .crt-flicker, .glow-overlay').forEach(el => el.style.display = 'none'); document.getElementById('cyberpunkToggle').checked = false; }
+    document.getElementById('breakingNewsToggle').checked = appState.settings.breakingNews;
+    document.getElementById('liveSimToggle').checked = appState.settings.liveSim;
+    document.getElementById('autoMarkReadToggle').checked = appState.settings.autoMarkRead;
+    document.getElementById('geminiKey').value = appState.settings.geminiKey || '';
+    document.getElementById('newsApiKey').value = appState.settings.newsApiKey || '';
+    document.getElementById('gnewsApiKey').value = appState.settings.gnewsApiKey || '';
+    document.getElementById('defaultViewSelect').value = appState.settings.viewMode || 'row';
+    document.getElementById('accentColorPicker').value = appState.settings.accentColor || '#00ff9d';
+    document.documentElement.style.setProperty('--color-electric-green', appState.settings.accentColor || '#00ff9d');
+    checkBreakingNews(); 
+}
+
+function saveSettings() {
+    appState.settings.cyberpunk = document.getElementById('cyberpunkToggle').checked;
+    appState.settings.breakingNews = document.getElementById('breakingNewsToggle').checked;
+    appState.settings.liveSim = document.getElementById('liveSimToggle').checked;
+    appState.settings.autoMarkRead = document.getElementById('autoMarkReadToggle').checked;
+    appState.settings.geminiKey = document.getElementById('geminiKey').value;
+    appState.settings.newsApiKey = document.getElementById('newsApiKey').value;
+    appState.settings.gnewsApiKey = document.getElementById('gnewsApiKey').value;
+    appState.settings.viewMode = document.getElementById('defaultViewSelect').value;
+    appState.settings.accentColor = document.getElementById('accentColorPicker').value;
+
+    localStorage.setItem('nexus_settings', JSON.stringify(appState.settings));
+    applySettings(); applyViewMode(appState.settings.viewMode); refreshData(); startLiveSimulation(); 
+    if (appState.charts.sentiment) appState.charts.sentiment.destroy();
+    initCharts();
+    updateAnalytics(); 
+    
+    document.getElementById('settingsModal').classList.remove('active');
+    showNotification("Configuration Saved", "success");
+}
+
+// ===== Keyword Logic (Mute & Highlight) =====
+function addMutedKeyword() {
+    const input = document.getElementById('newKeywordInput');
+    const word = input.value.trim();
+    if(word && !appState.settings.mutedKeywords.includes(word)) {
+        appState.settings.mutedKeywords.push(word);
+        localStorage.setItem('nexus_settings', JSON.stringify(appState.settings));
+        renderMutedKeywords();
+        input.value = '';
+        showNotification(`Muted: "${word}"`, 'info');
+        renderFeed();
+    }
+}
+
+function removeMutedKeyword(word) {
+    appState.settings.mutedKeywords = appState.settings.mutedKeywords.filter(w => w !== word);
+    localStorage.setItem('nexus_settings', JSON.stringify(appState.settings));
+    renderMutedKeywords();
+    renderFeed();
+}
+
+function renderMutedKeywords() {
+    const container = document.getElementById('mutedKeywordsList');
+    if(container) {
+        container.innerHTML = appState.settings.mutedKeywords.map(word => `
+            <span class="keyword-tag">
+                ${word}
+                <i data-lucide="x" size="12" class="keyword-tag-remove" onclick="removeMutedKeyword('${word}')"></i>
+            </span>
+        `).join('');
+        if(window.lucide) window.lucide.createIcons();
+    }
+}
+
+function addHighlightKeyword() {
+    const input = document.getElementById('newHighlightInput');
+    const word = input.value.trim();
+    if(word && !appState.settings.highlightKeywords.includes(word)) {
+        appState.settings.highlightKeywords.push(word);
+        localStorage.setItem('nexus_settings', JSON.stringify(appState.settings));
+        renderHighlightKeywords();
+        input.value = '';
+        showNotification(`Highlighting: "${word}"`, 'info');
+        renderFeed();
+    }
+}
+
+function removeHighlightKeyword(word) {
+    appState.settings.highlightKeywords = appState.settings.highlightKeywords.filter(w => w !== word);
+    localStorage.setItem('nexus_settings', JSON.stringify(appState.settings));
+    renderHighlightKeywords();
+    renderFeed();
+}
+
+function renderHighlightKeywords() {
+    const container = document.getElementById('highlightKeywordsList');
+    if(container) {
+        container.innerHTML = appState.settings.highlightKeywords.map(word => `
+            <span class="keyword-tag highlight">
+                ${word}
+                <i data-lucide="x" size="12" class="keyword-tag-remove" onclick="removeHighlightKeyword('${word}')"></i>
+            </span>
+        `).join('');
+        if(window.lucide) window.lucide.createIcons();
+    }
+}
+
+document.getElementById('addKeywordBtn')?.addEventListener('click', addMutedKeyword);
+document.getElementById('addHighlightBtn')?.addEventListener('click', addHighlightKeyword);
+
+function forceBreakingNews() {
+    const mock = {
+        id: `force_${Date.now()}`,
+        title: "CRITICAL: AI SUPERMODEL BREAKTHROUGH CONFIRMED",
+        summary: "Intelligence agencies report a massive leap in computational efficiency. Global markets reacting instantly. Energy sector put on high alert.",
+        source: "NEXUS ALERT",
+        url: "#",
+        timeObj: new Date(),
+        time: "JUST NOW",
+        tag: "ai",
+        impact: "high",
+        impactScore: "9.9",
+        lat: 40.7128,
+        lng: -74.0060,
+        aiAnalysis: null
+    };
+    appState.articles.unshift(mock);
+    refreshUIComponents();
+    showNotification("SIMULATED BREAKING EVENT", "error");
+}
+
+function showNotification(text, type = 'info') {
+    const el = document.getElementById('notificationArea');
+    document.getElementById('notificationText').innerText = text;
+    el.className = `notification ${type}`; // Reset classes
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 3000);
+}
+
+// ===== ENHANCED SEARCH LOGIC =====
+function toggleSearch() {
+    const modal = document.getElementById('searchModal');
+    if(modal.classList.contains('active')) {
+        modal.classList.remove('active');
+    } else { 
+        modal.classList.add('active'); 
+        const input = document.getElementById('searchInput');
+        input.value = ''; 
+        renderRecentSearches(); 
+        setTimeout(() => input.focus(), 100); 
+    }
+}
+
+function addToRecentSearches(term) {
+    if(!term) return;
+    const existingIndex = appState.recentSearches.indexOf(term);
+    if(existingIndex > -1) {
+        appState.recentSearches.splice(existingIndex, 1);
+    }
+    appState.recentSearches.unshift(term);
+    if(appState.recentSearches.length > 5) appState.recentSearches.pop();
+    localStorage.setItem('nexus_recent_searches', JSON.stringify(appState.recentSearches));
+}
+
+function removeRecentSearch(term, e) {
+    e.stopPropagation();
+    const index = appState.recentSearches.indexOf(term);
+    if(index > -1) {
+        appState.recentSearches.splice(index, 1);
+        localStorage.setItem('nexus_recent_searches', JSON.stringify(appState.recentSearches));
+        renderRecentSearches();
+    }
+}
+
+function renderRecentSearches() {
+    const container = document.getElementById('searchResults');
+    if(appState.recentSearches.length === 0) {
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--color-text-muted);"><i data-lucide="command" style="margin-bottom: 10px; opacity: 0.5;"></i><br>Type to search global intelligence...</div>';
+        if(window.lucide) window.lucide.createIcons();
+        return;
+    }
+    
+    let html = '<div class="recent-section-title">Recent Searches</div>';
+    appState.recentSearches.forEach((term, index) => {
+        html += `
+            <div class="recent-item" onclick="triggerSearchFromHistory('${term}')">
+                <div style="display:flex; align-items:center;">
+                    <i data-lucide="clock" size="14"></i>
+                    <span>${term}</span>
+                </div>
+                <button class="recent-delete" onclick="removeRecentSearch('${term}', event)" title="Remove"><i data-lucide="x" size="12"></i></button>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+    if(window.lucide) window.lucide.createIcons();
+    appState.searchIndex = -1; 
+}
+
+window.triggerSearchFromHistory = function(term) {
+    const input = document.getElementById('searchInput');
+    input.value = term;
+    const event = new Event('input');
+    input.dispatchEvent(event);
+};
+
+// Search Input Logic with Grouping
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    const resultsContainer = document.getElementById('searchResults');
+    
+    if(query.length === 0) {
+        renderRecentSearches();
+        return;
+    }
+
+    const hits = appState.articles.filter(a => a.title.toLowerCase().includes(query) || a.summary.toLowerCase().includes(query));
+    
+    if(hits.length === 0) {
+        resultsContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-muted);">No signals found matching criteria.</div>';
+        return;
+    }
+
+    // Group by Tag
+    const grouped = hits.reduce((acc, hit) => {
+        const cat = hit.tag.toUpperCase();
+        if(!acc[cat]) acc[cat] = [];
+        acc[cat].push(hit);
+        return acc;
+    }, {});
+
+    let html = '';
+    for(const [category, items] of Object.entries(grouped)) {
+        html += `<div class="search-category-header">${category}</div>`;
+        items.forEach(hit => {
+             const highlightedTitle = hit.title.replace(new RegExp(query, 'gi'), (match) => `<span class="search-highlight">${match}</span>`);
+             html += `
+            <div class="search-result-item" data-id="${hit.id}" onclick="openReader('${hit.id}', true); toggleSearch();">
+                <div class="search-icon-box"><i data-lucide="${getTagIcon(hit.tag)}"></i></div>
+                <div>
+                    <div style="font-weight:700; color:#fff; font-size:0.9rem;">${highlightedTitle}</div>
+                    <div style="font-size:0.75rem; color:var(--color-text-muted); margin-top:2px;">${hit.source} • ${hit.time}</div>
+                </div>
+            </div>`;
+        });
+    }
+
+    resultsContainer.innerHTML = html;
+    if(window.lucide) window.lucide.createIcons();
+    appState.searchIndex = -1; 
+});
+
+// Keyboard Navigation for Search
+document.getElementById('searchInput').addEventListener('keydown', (e) => {
+    const items = document.querySelectorAll('.search-result-item, .recent-item');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        appState.searchIndex++;
+        if (appState.searchIndex >= items.length) appState.searchIndex = 0;
+        updateSelection(items);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        appState.searchIndex--;
+        if (appState.searchIndex < 0) appState.searchIndex = items.length - 1;
+        updateSelection(items);
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (appState.searchIndex > -1 && items[appState.searchIndex]) {
+            items[appState.searchIndex].click();
+        }
+    }
+});
+
+function updateSelection(items) {
+    items.forEach((item, idx) => {
+        if (idx === appState.searchIndex) {
+            item.classList.add('selected');
+            item.scrollIntoView({ block: 'nearest' });
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+document.getElementById('downloadBriefBtn').addEventListener('click', () => {
+    const saved = appState.articles.filter(a => appState.savedArticles.includes(a.id));
+    if(saved.length === 0) return;
+    let content = `NEXUS INTEL BRIEF\nGenerated: ${new Date().toLocaleString()}\n\n`;
+    saved.forEach((a, i) => { content += `${i+1}. ${a.title}\nSource: ${a.source} | ${a.time}\nSummary: ${a.summary}\nLink: ${a.url}\n\n`; });
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `NEXUS_Brief_${Date.now()}.txt`; a.click();
+    showNotification("Brief Downloaded", "success");
+});
+
 // Info Modal Tabs Logic
 window.openInfoModal = function(tabName) {
     document.getElementById('infoModal').classList.add('active');

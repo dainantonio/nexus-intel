@@ -9,7 +9,6 @@
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://unpkg.com">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
@@ -111,11 +110,11 @@
                     </div>
                     <div id="tab-privacy" class="info-section">
                         <h3 style="margin-bottom:15px; color:white;">Data Privacy Protocol</h3>
-                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">Nexus Intel operates on a zero-retention policy for user search queries. All geospatial data is anonymized before aggregation. We adhere to GDPR and CCPA compliance standards for all data vectors.</p>
+                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">Nexus Intel operates on a zero-retention policy for user search queries. All geospatial data is anonymized before aggregation.</p>
                     </div>
                     <div id="tab-terms" class="info-section">
                         <h3 style="margin-bottom:15px; color:white;">Terms of Service</h3>
-                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">By accessing the NEXUS mainframe, you agree to utilize the intelligence provided for lawful predictive analysis only. Market manipulation based on simulated signals is strictly prohibited.</p>
+                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">By accessing the NEXUS mainframe, you agree to utilize the intelligence provided for lawful predictive analysis only.</p>
                     </div>
                 </div>
             </div>
@@ -130,8 +129,7 @@
                     <button class="action-btn" onclick="document.getElementById('helpModal').classList.remove('active')" aria-label="Close Help"><i data-lucide="x"></i></button>
                 </div>
                 <div class="help-grid">
-                    <div class="help-item"><span>Search Modal</span> <span class="help-key">Cmd + K</span></div>
-                    <div class="help-item"><span>Focus Search</span> <span class="help-key">/</span></div>
+                    <div class="help-item"><span>Search</span> <span class="help-key">Cmd + K</span></div>
                     <div class="help-item"><span>Toggle View</span> <span class="help-key">V</span></div>
                     <div class="help-item"><span>Refresh Data</span> <span class="help-key">R</span></div>
                     <div class="help-item"><span>Toggle Settings</span> <span class="help-key">S</span></div>
@@ -160,79 +158,6 @@
                         </div>
                         <label class="switch"><input type="checkbox" id="cyberpunkToggle"><span class="slider"></span></label>
                     </div>
-                    <div class="setting-item">
-                        <div>
-                            <div style="font-weight: 500;">Default View Mode</div>
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Preferred dashboard layout</div>
-                        </div>
-                         <select id="defaultViewSelect" style="background: rgba(0,0,0,0.3); border: 1px solid var(--color-border); padding: 5px 10px; color: white; border-radius: 4px;">
-                            <option value="row">Row View</option>
-                            <option value="grid">Grid View</option>
-                        </select>
-                    </div>
-                    <div class="setting-item">
-                        <div>
-                            <div style="font-weight: 500;">Auto-Mark Read</div>
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Mark read when opening</div>
-                        </div>
-                        <label class="switch"><input type="checkbox" id="autoMarkReadToggle" checked><span class="slider"></span></label>
-                    </div>
-                    <div class="setting-item">
-                        <div>
-                            <div style="font-weight: 500;">Accent Color</div>
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Primary theme color</div>
-                        </div>
-                        <input type="color" id="accentColorPicker" class="color-picker-input" value="#00ff9d">
-                    </div>
-                </div>
-                <div class="setting-group">
-                    <h3><i data-lucide="filter"></i> Intelligence Filters</h3>
-                    <div class="setting-item" style="display:block;">
-                         <div style="font-weight: 500;">Highlight Keywords</div>
-                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Visually tag signals (comma separated)</div>
-                         <div class="keyword-input-container">
-                             <input type="text" id="newHighlightInput" class="setting-input" placeholder="e.g. nvidia, fusion" style="margin-top:0;">
-                             <button id="addHighlightBtn" class="action-btn" style="width: 40px; height: 38px; border-radius: 6px;"><i data-lucide="plus"></i></button>
-                         </div>
-                         <div id="highlightKeywordsList" class="keyword-tags"></div>
-                    </div>
-                    <div class="setting-item" style="display:block;">
-                         <div style="font-weight: 500;">Muted Keywords</div>
-                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Hide signals containing these words</div>
-                         <div class="keyword-input-container">
-                             <input type="text" id="newKeywordInput" class="setting-input" placeholder="e.g. crypto, gossip" style="margin-top:0;">
-                             <button id="addKeywordBtn" class="action-btn" style="width: 40px; height: 38px; border-radius: 6px;"><i data-lucide="plus"></i></button>
-                         </div>
-                         <div id="mutedKeywordsList" class="keyword-tags"></div>
-                    </div>
-                </div>
-                <div class="setting-group">
-                    <h3><i data-lucide="bell"></i> Data Stream</h3>
-                    <div class="setting-item">
-                        <div>
-                            <div style="font-weight: 500;">Breaking News Alerts</div>
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Top banner for high impact events</div>
-                        </div>
-                        <label class="switch"><input type="checkbox" id="breakingNewsToggle" checked><span class="slider"></span></label>
-                    </div>
-                    <div class="setting-item">
-                         <button id="forceBreakingBtn" style="width:100%; padding:10px; background:rgba(255, 71, 87, 0.1); color:#ff4757; border:1px solid #ff4757; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.8rem;">
-                            <i data-lucide="alert-triangle" size="14" style="margin-right:5px;"></i> SIMULATE BREAKING EVENT
-                        </button>
-                    </div>
-                    <div class="setting-item">
-                        <div>
-                            <div style="font-weight: 500;">Live Simulation</div>
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Inject mock events every 45s</div>
-                        </div>
-                        <label class="switch"><input type="checkbox" id="liveSimToggle"><span class="slider"></span></label>
-                    </div>
-                </div>
-                <div class="setting-group">
-                    <h3><i data-lucide="key"></i> API Configuration</h3>
-                    <input type="password" id="geminiKey" class="setting-input" placeholder="Gemini API Key">
-                    <input type="password" id="newsApiKey" class="setting-input" placeholder="NewsAPI Key">
-                    <input type="password" id="gnewsApiKey" class="setting-input" placeholder="GNews API Key">
                 </div>
                 <button id="saveSettingsBtn" style="width: 100%; padding: 14px; background: var(--color-electric-green); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #000;">SAVE CONFIGURATION</button>
             </div>
@@ -262,18 +187,12 @@
                 </div>
             </div>
             <div class="header-actions">
-                <div class="persistent-search-container">
-                    <i data-lucide="search" size="16" class="persistent-search-icon"></i>
-                    <input type="text" id="feedSearchInput" class="persistent-search-input" placeholder="Full text intel search..." aria-label="Search Feed">
-                    <button id="clearSearchBtn" class="search-clear-btn" title="Clear Search"><i data-lucide="circle-x" size="16"></i></button>
-                </div>
-
                 <button class="action-btn mobile-widgets-btn" id="mobileWidgetsToggle" title="Toggle Widgets"><i data-lucide="bar-chart-2"></i></button>
-                <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode" aria-label="TLDR Mode"><i data-lucide="list"></i></button>
+                <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode"><i data-lucide="list"></i></button>
                 <div id="systemClock" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--color-electric-green); border: 1px solid rgba(0,255,157,0.2); padding: 8px 12px; border-radius: 8px; margin-right: 10px;">00:00:00 UTC</div>
-                <button class="action-btn" id="refreshBtn" title="Refresh Feed" aria-label="Refresh"><i data-lucide="refresh-cw"></i></button>
-                <button class="action-btn" id="triggerSearchBtn" title="Global Command (Cmd+K)" aria-label="Search"><i data-lucide="command"></i></button>
-                <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)" aria-label="Settings"><i data-lucide="settings"></i></button>
+                <button class="action-btn" id="refreshBtn" title="Refresh Feed"><i data-lucide="refresh-cw"></i></button>
+                <button class="action-btn" id="triggerSearchBtn" title="Search (Cmd+K)"><i data-lucide="search"></i></button>
+                <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)"><i data-lucide="settings"></i></button>
             </div>
         </header>
 
@@ -291,7 +210,6 @@
         <div class="filter-container">
             <div class="filter-chip active" data-filter="all"><i data-lucide="layers" size="14"></i> ALL NEXUS <span class="filter-chip-count"></span><span id="badge-all" class="chip-badge"></span></div>
             <div class="filter-chip" data-filter="unread"><i data-lucide="mail" size="14"></i> UNREAD <span class="filter-chip-count"></span><span id="badge-unread" class="chip-badge"></span></div>
-            <div id="searchResultChip" class="filter-chip" data-filter="search" style="display:none; border-color:var(--color-electric-green); color:var(--color-electric-green);"><i data-lucide="search" size="14"></i> SEARCH RESULTS <span class="filter-chip-count"></span></div>
             <div class="filter-chip" data-filter="ai"><i data-lucide="cpu" size="14"></i> AI <span class="filter-chip-count"></span><span id="badge-ai" class="chip-badge"></span></div>
             <div class="filter-chip" data-filter="energy"><i data-lucide="zap" size="14"></i> ENERGY <span class="filter-chip-count"></span><span id="badge-energy" class="chip-badge"></span></div>
             <div class="filter-chip" data-filter="realestate"><i data-lucide="building" size="14"></i> REAL ESTATE <span class="filter-chip-count"></span><span id="badge-realestate" class="chip-badge"></span></div>
@@ -325,7 +243,6 @@
                 </div>
                 <i data-lucide="arrow-right" size="16"></i>
             </div>
-
             <div class="feed-header">
                 <div style="display:flex; align-items:center; gap: 15px;">
                     <h2 id="feedTitle" style="font-size:1.1rem; font-weight:700;">LIVE INTELLIGENCE</h2>
@@ -336,16 +253,13 @@
                         <button class="view-btn active" data-view="row" title="Row View"><i data-lucide="rows" size="16"></i></button>
                         <button class="view-btn" data-view="grid" title="Grid View"><i data-lucide="layout-grid" size="16"></i></button>
                     </div>
-                    <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.1); margin: 0 10px;"></div>
-                    <select id="sortSelect" class="sort-select" aria-label="Sort Articles">
+                    <select id="sortSelect" class="sort-select">
                         <option value="latest">Latest</option>
                         <option value="unread_first">Unread First</option>
-                        <option value="read_first">Read First</option>
                         <option value="impact">Highest Impact</option>
                     </select>
                 </div>
             </div>
-
             <div id="articlesContainer"></div>
         </main>
 
@@ -357,7 +271,6 @@
                 </div>
                 <div id="topBriefWidget" class="brief-content-wrapper"></div>
             </div>
-
             <div class="sidebar-section">
                 <h3><i data-lucide="gauge"></i> MARKET SENTIMENT</h3>
                 <div class="sentiment-gauge-wrapper">
@@ -368,54 +281,17 @@
                     </div>
                 </div>
             </div>
-
-            <div class="sidebar-section">
-                <h3><i data-lucide="activity"></i> SYSTEM HEALTH</h3>
-                <div class="stat-grid">
-                    <div class="health-bar-container">
-                        <div class="health-label"><span>CPU LOAD</span><span style="color:#00ff9d">32%</span></div>
-                        <div class="health-progress-bg"><div class="health-progress-fill" style="width:32%"></div></div>
-                    </div>
-                    <div class="health-bar-container">
-                        <div class="health-label"><span>MEMORY</span><span style="color:#0095ff">14.2GB</span></div>
-                        <div class="health-progress-bg"><div class="health-progress-fill" style="width:45%; background:#0095ff"></div></div>
-                    </div>
-                    <div class="health-bar-container">
-                        <div class="health-label"><span>NETWORK</span><span style="color:#8a2be2">1.2GB/s</span></div>
-                        <div class="health-progress-bg"><div class="health-progress-fill" style="width:78%; background:#8a2be2"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sidebar-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
-                    <h3 style="margin-bottom:0"><i data-lucide="bookmark"></i> QUICK SAVED</h3>
-                    <button id="downloadBriefBtn" style="background:none; border:none; color:var(--color-electric-green); cursor:pointer; font-size:0.7rem; font-weight:700; display:none; letter-spacing:0.5px;">
-                        <i data-lucide="download" size="12" style="margin-right:4px;"></i> EXPORT
-                    </button>
-                </div>
-                <div id="quickSavedList" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 12px;">
-                    <span style="color: var(--color-text-muted); font-style: italic; font-size: 0.8rem;">No bookmarks yet.</span>
-                </div>
-            </div>
         </aside>
 
         <footer class="app-footer">
             <div class="footer-status">
                 <div class="footer-status-item"><div class="status-dot"></div><span>SECURE TLS v1.3</span></div>
                 <div class="footer-status-item"><span>LATENCY: <span id="footerLatency">12ms</span></span></div>
-                <div class="footer-status-item" id="sessionStatus" style="color:var(--color-electric-green); opacity:0; transition:opacity 0.5s;"><span>SESSION SAVED</span></div>
             </div>
-            <div class="footer-center">NEXUS INTEL v4.0.2 (BETA) | © 2026</div>
-            <div class="footer-links">
-                <span class="footer-link" onclick="openInfoModal('api')">API DOCS</span>
-                <span class="footer-link" onclick="openInfoModal('logs')">SYSTEM LOGS</span>
-                <span class="footer-link" onclick="openInfoModal('privacy')">PRIVACY</span>
-                <span class="footer-link" onclick="openInfoModal('terms')">TERMS</span>
-            </div>
+            <div class="footer-center">NEXUS INTEL v4.0.2 | © 2026</div>
         </footer>
     </div>
-    
+
     <script src="script.js"></script>
 </body>
 </html>

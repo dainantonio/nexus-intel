@@ -110,11 +110,11 @@
                     </div>
                     <div id="tab-privacy" class="info-section">
                         <h3 style="margin-bottom:15px; color:white;">Data Privacy Protocol</h3>
-                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">Nexus Intel operates on a zero-retention policy for user search queries. All geospatial data is anonymized before aggregation.</p>
+                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">Nexus Intel operates on a zero-retention policy for user search queries. All geospatial data is anonymized before aggregation. We adhere to GDPR and CCPA compliance standards for all data vectors.</p>
                     </div>
                     <div id="tab-terms" class="info-section">
                         <h3 style="margin-bottom:15px; color:white;">Terms of Service</h3>
-                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">By accessing the NEXUS mainframe, you agree to utilize the intelligence provided for lawful predictive analysis only.</p>
+                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">By accessing the NEXUS mainframe, you agree to utilize the intelligence provided for lawful predictive analysis only. Market manipulation based on simulated signals is strictly prohibited.</p>
                     </div>
                 </div>
             </div>
@@ -129,7 +129,8 @@
                     <button class="action-btn" onclick="document.getElementById('helpModal').classList.remove('active')" aria-label="Close Help"><i data-lucide="x"></i></button>
                 </div>
                 <div class="help-grid">
-                    <div class="help-item"><span>Search</span> <span class="help-key">Cmd + K</span></div>
+                    <div class="help-item"><span>Search Modal</span> <span class="help-key">Cmd + K</span></div>
+                    <div class="help-item"><span>Focus Search</span> <span class="help-key">/</span></div>
                     <div class="help-item"><span>Toggle View</span> <span class="help-key">V</span></div>
                     <div class="help-item"><span>Refresh Data</span> <span class="help-key">R</span></div>
                     <div class="help-item"><span>Toggle Settings</span> <span class="help-key">S</span></div>
@@ -158,6 +159,79 @@
                         </div>
                         <label class="switch"><input type="checkbox" id="cyberpunkToggle"><span class="slider"></span></label>
                     </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Default View Mode</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Preferred dashboard layout</div>
+                        </div>
+                         <select id="defaultViewSelect" style="background: rgba(0,0,0,0.3); border: 1px solid var(--color-border); padding: 5px 10px; color: white; border-radius: 4px;">
+                            <option value="row">Row View</option>
+                            <option value="grid">Grid View</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Auto-Mark Read</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Mark read when opening</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="autoMarkReadToggle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Accent Color</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Primary theme color</div>
+                        </div>
+                        <input type="color" id="accentColorPicker" class="color-picker-input" value="#00ff9d">
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="filter"></i> Intelligence Filters</h3>
+                    <div class="setting-item" style="display:block;">
+                         <div style="font-weight: 500;">Highlight Keywords</div>
+                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Visually tag signals (comma separated)</div>
+                         <div class="keyword-input-container">
+                             <input type="text" id="newHighlightInput" class="setting-input" placeholder="e.g. nvidia, fusion" style="margin-top:0;">
+                             <button id="addHighlightBtn" class="action-btn" style="width: 40px; height: 38px; border-radius: 6px;"><i data-lucide="plus"></i></button>
+                         </div>
+                         <div id="highlightKeywordsList" class="keyword-tags"></div>
+                    </div>
+                    <div class="setting-item" style="display:block;">
+                         <div style="font-weight: 500;">Muted Keywords</div>
+                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Hide signals containing these words</div>
+                         <div class="keyword-input-container">
+                             <input type="text" id="newKeywordInput" class="setting-input" placeholder="e.g. crypto, gossip" style="margin-top:0;">
+                             <button id="addKeywordBtn" class="action-btn" style="width: 40px; height: 38px; border-radius: 6px;"><i data-lucide="plus"></i></button>
+                         </div>
+                         <div id="mutedKeywordsList" class="keyword-tags"></div>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="bell"></i> Data Stream</h3>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Breaking News Alerts</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Top banner for high impact events</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="breakingNewsToggle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-item">
+                         <button id="forceBreakingBtn" style="width:100%; padding:10px; background:rgba(255, 71, 87, 0.1); color:#ff4757; border:1px solid #ff4757; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.8rem;">
+                            <i data-lucide="alert-triangle" size="14" style="margin-right:5px;"></i> SIMULATE BREAKING EVENT
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Live Simulation</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Inject mock events every 45s</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="liveSimToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="key"></i> API Configuration</h3>
+                    <input type="password" id="geminiKey" class="setting-input" placeholder="Gemini API Key">
+                    <input type="password" id="newsApiKey" class="setting-input" placeholder="NewsAPI Key">
+                    <input type="password" id="gnewsApiKey" class="setting-input" placeholder="GNews API Key">
                 </div>
                 <button id="saveSettingsBtn" style="width: 100%; padding: 14px; background: var(--color-electric-green); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #000;">SAVE CONFIGURATION</button>
             </div>
@@ -187,12 +261,18 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="persistent-search-container">
+                    <i data-lucide="search" size="16" class="persistent-search-icon"></i>
+                    <input type="text" id="feedSearchInput" class="persistent-search-input" placeholder="Full text intel search..." aria-label="Search Feed">
+                    <button id="clearSearchBtn" class="search-clear-btn" title="Clear Search"><i data-lucide="circle-x" size="16"></i></button>
+                </div>
+
                 <button class="action-btn mobile-widgets-btn" id="mobileWidgetsToggle" title="Toggle Widgets"><i data-lucide="bar-chart-2"></i></button>
-                <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode"><i data-lucide="list"></i></button>
+                <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode" aria-label="TLDR Mode"><i data-lucide="list"></i></button>
                 <div id="systemClock" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--color-electric-green); border: 1px solid rgba(0,255,157,0.2); padding: 8px 12px; border-radius: 8px; margin-right: 10px;">00:00:00 UTC</div>
-                <button class="action-btn" id="refreshBtn" title="Refresh Feed"><i data-lucide="refresh-cw"></i></button>
-                <button class="action-btn" id="triggerSearchBtn" title="Search (Cmd+K)"><i data-lucide="search"></i></button>
-                <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)"><i data-lucide="settings"></i></button>
+                <button class="action-btn" id="refreshBtn" title="Refresh Feed" aria-label="Refresh"><i data-lucide="refresh-cw"></i></button>
+                <button class="action-btn" id="triggerSearchBtn" title="Global Command (Cmd+K)" aria-label="Search"><i data-lucide="command"></i></button>
+                <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)" aria-label="Settings"><i data-lucide="settings"></i></button>
             </div>
         </header>
 
@@ -203,95 +283,4 @@
             </div>
             <div style="width: 200px; display:flex; flex-direction:column; gap:5px;">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--color-text-muted);"><span>CONFIDENCE</span><span>94%</span></div>
-                <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px;"><div style="width:94%; height:100%; background:var(--color-data-blue); border-radius:3px;"></div></div>
-            </div>
-        </div>
-
-        <div class="filter-container">
-            <div class="filter-chip active" data-filter="all"><i data-lucide="layers" size="14"></i> ALL NEXUS <span class="filter-chip-count"></span><span id="badge-all" class="chip-badge"></span></div>
-            <div class="filter-chip" data-filter="unread"><i data-lucide="mail" size="14"></i> UNREAD <span class="filter-chip-count"></span><span id="badge-unread" class="chip-badge"></span></div>
-            <div class="filter-chip" data-filter="ai"><i data-lucide="cpu" size="14"></i> AI <span class="filter-chip-count"></span><span id="badge-ai" class="chip-badge"></span></div>
-            <div class="filter-chip" data-filter="energy"><i data-lucide="zap" size="14"></i> ENERGY <span class="filter-chip-count"></span><span id="badge-energy" class="chip-badge"></span></div>
-            <div class="filter-chip" data-filter="realestate"><i data-lucide="building" size="14"></i> REAL ESTATE <span class="filter-chip-count"></span><span id="badge-realestate" class="chip-badge"></span></div>
-            <div class="filter-chip" data-filter="policy"><i data-lucide="scale" size="14"></i> POLICY <span class="filter-chip-count"></span><span id="badge-policy" class="chip-badge"></span></div>
-            <div class="filter-chip" data-filter="breaking"><i data-lucide="alert-circle" size="14"></i> BREAKING <span class="filter-chip-count"></span></div>
-            <div class="filter-chip" data-filter="saved"><i data-lucide="bookmark" size="14"></i> SAVED <span class="filter-chip-count"></span></div>
-        </div>
-
-        <aside class="left-sidebar">
-            <div class="sidebar-section">
-                <h3><i data-lucide="map"></i> GEOSPATIAL INTEL</h3>
-                <div id="miniMap">
-                    <div class="map-scan-overlay"></div>
-                </div>
-            </div>
-            <div class="sidebar-section">
-                <h3><i data-lucide="pie-chart"></i> IMPACT DISTRIBUTION</h3>
-                <div id="impactChart"></div>
-            </div>
-            <div class="sidebar-section">
-                <h3><i data-lucide="hash"></i> TRENDING SIGNALS</h3>
-                <div id="trendingContainer"></div>
-            </div>
-        </aside>
-
-        <main class="main-feed" id="mainFeed">
-            <div id="breakingBanner" class="breaking-banner">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <i data-lucide="alert-triangle"></i>
-                    <span id="breakingText">BREAKING: MAJOR REGULATORY SHIFT DETECTED</span>
-                </div>
-                <i data-lucide="arrow-right" size="16"></i>
-            </div>
-            <div class="feed-header">
-                <div style="display:flex; align-items:center; gap: 15px;">
-                    <h2 id="feedTitle" style="font-size:1.1rem; font-weight:700;">LIVE INTELLIGENCE</h2>
-                    <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px;"><span id="articleCount">0</span> NODES</span>
-                </div>
-                <div class="feed-controls">
-                     <div class="view-toggle">
-                        <button class="view-btn active" data-view="row" title="Row View"><i data-lucide="rows" size="16"></i></button>
-                        <button class="view-btn" data-view="grid" title="Grid View"><i data-lucide="layout-grid" size="16"></i></button>
-                    </div>
-                    <select id="sortSelect" class="sort-select">
-                        <option value="latest">Latest</option>
-                        <option value="unread_first">Unread First</option>
-                        <option value="impact">Highest Impact</option>
-                    </select>
-                </div>
-            </div>
-            <div id="articlesContainer"></div>
-        </main>
-
-        <aside class="right-sidebar" id="rightSidebar">
-            <div class="sidebar-section">
-                <div class="brief-header" onclick="toggleBrief()">
-                    <h3><i data-lucide="list"></i> TOP INTELLIGENCE BRIEF</h3>
-                    <i data-lucide="chevron-up" id="briefChevron" style="width:16px; transition: transform 0.3s;"></i>
-                </div>
-                <div id="topBriefWidget" class="brief-content-wrapper"></div>
-            </div>
-            <div class="sidebar-section">
-                <h3><i data-lucide="gauge"></i> MARKET SENTIMENT</h3>
-                <div class="sentiment-gauge-wrapper">
-                    <div id="sentimentRadialChart"></div>
-                    <div class="sentiment-value-overlay">
-                        <div id="sentimentValue" class="sentiment-score">--</div>
-                        <div id="sentimentText" class="sentiment-text">ANALYZING</div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <footer class="app-footer">
-            <div class="footer-status">
-                <div class="footer-status-item"><div class="status-dot"></div><span>SECURE TLS v1.3</span></div>
-                <div class="footer-status-item"><span>LATENCY: <span id="footerLatency">12ms</span></span></div>
-            </div>
-            <div class="footer-center">NEXUS INTEL v4.0.2 | © 2026</div>
-        </footer>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+                <div style="height:6px; background:rgba(255,255,255,0.1

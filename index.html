@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://unpkg.com">
     
+    <link rel="manifest" href="manifest.json">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
@@ -259,11 +261,17 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="persistent-search-container">
+                    <i data-lucide="search" size="16" class="persistent-search-icon"></i>
+                    <input type="text" id="feedSearchInput" class="persistent-search-input" placeholder="Full text intel search..." aria-label="Search Feed">
+                    <button id="clearSearchBtn" class="search-clear-btn" title="Clear Search"><i data-lucide="circle-x" size="16"></i></button>
+                </div>
+
                 <button class="action-btn mobile-widgets-btn" id="mobileWidgetsToggle" title="Toggle Widgets"><i data-lucide="bar-chart-2"></i></button>
                 <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode" aria-label="TLDR Mode"><i data-lucide="list"></i></button>
                 <div id="systemClock" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--color-electric-green); border: 1px solid rgba(0,255,157,0.2); padding: 8px 12px; border-radius: 8px; margin-right: 10px;">00:00:00 UTC</div>
                 <button class="action-btn" id="refreshBtn" title="Refresh Feed" aria-label="Refresh"><i data-lucide="refresh-cw"></i></button>
-                <button class="action-btn" id="triggerSearchBtn" title="Search (Cmd+K)" aria-label="Search"><i data-lucide="search"></i></button>
+                <button class="action-btn" id="triggerSearchBtn" title="Global Command (Cmd+K)" aria-label="Search"><i data-lucide="command"></i></button>
                 <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)" aria-label="Settings"><i data-lucide="settings"></i></button>
             </div>
         </header>
@@ -282,6 +290,7 @@
         <div class="filter-container">
             <div class="filter-chip active" data-filter="all"><i data-lucide="layers" size="14"></i> ALL NEXUS <span class="filter-chip-count"></span><span id="badge-all" class="chip-badge"></span></div>
             <div class="filter-chip" data-filter="unread"><i data-lucide="mail" size="14"></i> UNREAD <span class="filter-chip-count"></span><span id="badge-unread" class="chip-badge"></span></div>
+            <div id="searchResultChip" class="filter-chip" data-filter="search" style="display:none; border-color:var(--color-electric-green); color:var(--color-electric-green);"><i data-lucide="search" size="14"></i> SEARCH RESULTS <span class="filter-chip-count"></span></div>
             <div class="filter-chip" data-filter="ai"><i data-lucide="cpu" size="14"></i> AI <span class="filter-chip-count"></span><span id="badge-ai" class="chip-badge"></span></div>
             <div class="filter-chip" data-filter="energy"><i data-lucide="zap" size="14"></i> ENERGY <span class="filter-chip-count"></span><span id="badge-energy" class="chip-badge"></span></div>
             <div class="filter-chip" data-filter="realestate"><i data-lucide="building" size="14"></i> REAL ESTATE <span class="filter-chip-count"></span><span id="badge-realestate" class="chip-badge"></span></div>

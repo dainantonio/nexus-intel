@@ -231,3 +231,191 @@
                 <div class="setting-group">
                     <h3><i data-lucide="key"></i> API Configuration</h3>
                     <input type="password" id="geminiKey" class="setting-input" placeholder="Gemini API Key">
+                    <input type="password" id="newsApiKey" class="setting-input" placeholder="NewsAPI Key">
+                    <input type="password" id="gnewsApiKey" class="setting-input" placeholder="GNews API Key">
+                </div>
+                <button id="saveSettingsBtn" style="width: 100%; padding: 14px; background: var(--color-electric-green); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #000;">SAVE CONFIGURATION</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="signal-ticker">
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <div class="ticker-item"><i data-lucide="activity"></i> SYSTEM ONLINE</div>
+                <div class="ticker-item"><i data-lucide="globe"></i> MONITORING GLOBAL GRIDS</div>
+                <div class="ticker-item"><i data-lucide="cpu"></i> AI TRAINING RUN DETECTED</div>
+                <div class="ticker-item"><i data-lucide="scale"></i> EU AI ACT COMPLIANCE CHECK</div>
+                <div class="ticker-item"><i data-lucide="zap"></i> DATA CENTER LOAD: NOMINAL</div>
+                <div class="ticker-item"><i data-lucide="trending-up"></i> NVIDIA STOCK VOLATILITY</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo-container">
+                <div class="logo-icon"><i data-lucide="aperture" style="color: #0a0a0f;"></i></div>
+                <div>
+                    <h1 style="font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px;">NEXUS INTEL</h1>
+                    <div style="font-size: 0.65rem; color: var(--color-text-muted); letter-spacing: 1.5px; font-weight: 600;">AI × DATA × ENERGY × POLICY</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="persistent-search-container">
+                    <i data-lucide="search" size="16" class="persistent-search-icon"></i>
+                    <input type="text" id="feedSearchInput" class="persistent-search-input" placeholder="Full text intel search..." aria-label="Search Feed">
+                    <button id="clearSearchBtn" class="search-clear-btn" title="Clear Search"><i data-lucide="circle-x" size="16"></i></button>
+                </div>
+
+                <button class="action-btn mobile-widgets-btn" id="mobileWidgetsToggle" title="Toggle Widgets"><i data-lucide="bar-chart-2"></i></button>
+                <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode" aria-label="TLDR Mode"><i data-lucide="list"></i></button>
+                <div id="systemClock" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--color-electric-green); border: 1px solid rgba(0,255,157,0.2); padding: 8px 12px; border-radius: 8px; margin-right: 10px;">00:00:00 UTC</div>
+                <button class="action-btn" id="refreshBtn" title="Refresh Feed" aria-label="Refresh"><i data-lucide="refresh-cw"></i></button>
+                <button class="action-btn" id="triggerSearchBtn" title="Global Command (Cmd+K)" aria-label="Search"><i data-lucide="command"></i></button>
+                <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)" aria-label="Settings"><i data-lucide="settings"></i></button>
+            </div>
+        </header>
+
+        <div class="intelligence-aggregator">
+            <div style="flex:1">
+                <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Global Threat Level</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #fff;">MODERATE <span style="font-size: 0.8rem; color: var(--color-electric-green); font-weight: 400;">STABLE</span></div>
+            </div>
+            <div style="width: 200px; display:flex; flex-direction:column; gap:5px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--color-text-muted);"><span>CONFIDENCE</span><span>94%</span></div>
+                <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px;"><div style="width:94%; height:100%; background:var(--color-data-blue); border-radius:3px;"></div></div>
+            </div>
+        </div>
+
+        <div class="filter-container">
+            <div class="filter-chip active" data-filter="all"><i data-lucide="layers" size="14"></i> ALL NEXUS <span class="filter-chip-count"></span><span id="badge-all" class="chip-badge"></span></div>
+            <div class="filter-chip" data-filter="unread"><i data-lucide="mail" size="14"></i> UNREAD <span class="filter-chip-count"></span><span id="badge-unread" class="chip-badge"></span></div>
+            <div id="searchResultChip" class="filter-chip" data-filter="search" style="display:none; border-color:var(--color-electric-green); color:var(--color-electric-green);"><i data-lucide="search" size="14"></i> SEARCH RESULTS <span class="filter-chip-count"></span></div>
+            <div class="filter-chip" data-filter="ai"><i data-lucide="cpu" size="14"></i> AI <span class="filter-chip-count"></span><span id="badge-ai" class="chip-badge"></span></div>
+            <div class="filter-chip" data-filter="energy"><i data-lucide="zap" size="14"></i> ENERGY <span class="filter-chip-count"></span><span id="badge-energy" class="chip-badge"></span></div>
+            <div class="filter-chip" data-filter="realestate"><i data-lucide="building" size="14"></i> REAL ESTATE <span class="filter-chip-count"></span><span id="badge-realestate" class="chip-badge"></span></div>
+            <div class="filter-chip" data-filter="policy"><i data-lucide="scale" size="14"></i> POLICY <span class="filter-chip-count"></span><span id="badge-policy" class="chip-badge"></span></div>
+            <div class="filter-chip" data-filter="breaking"><i data-lucide="alert-circle" size="14"></i> BREAKING <span class="filter-chip-count"></span></div>
+            <div class="filter-chip" data-filter="saved"><i data-lucide="bookmark" size="14"></i> SAVED <span class="filter-chip-count"></span></div>
+        </div>
+
+        <aside class="left-sidebar">
+            <div class="sidebar-section">
+                <h3><i data-lucide="map"></i> GEOSPATIAL INTEL</h3>
+                <div id="miniMap">
+                    <div class="map-scan-overlay"></div>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3><i data-lucide="pie-chart"></i> IMPACT DISTRIBUTION</h3>
+                <div id="impactChart"></div>
+            </div>
+            <div class="sidebar-section">
+                <h3><i data-lucide="hash"></i> TRENDING SIGNALS</h3>
+                <div id="trendingContainer"></div>
+            </div>
+        </aside>
+
+        <main class="main-feed" id="mainFeed">
+            <div id="breakingBanner" class="breaking-banner">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i data-lucide="alert-triangle"></i>
+                    <span id="breakingText">BREAKING: MAJOR REGULATORY SHIFT DETECTED</span>
+                </div>
+                <i data-lucide="arrow-right" size="16"></i>
+            </div>
+
+            <div class="feed-header">
+                <div style="display:flex; align-items:center; gap: 15px;">
+                    <h2 id="feedTitle" style="font-size:1.1rem; font-weight:700;">LIVE INTELLIGENCE</h2>
+                    <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px;"><span id="articleCount">0</span> NODES</span>
+                </div>
+                <div class="feed-controls">
+                     <div class="view-toggle">
+                        <button class="view-btn active" data-view="row" title="Row View"><i data-lucide="rows" size="16"></i></button>
+                        <button class="view-btn" data-view="grid" title="Grid View"><i data-lucide="layout-grid" size="16"></i></button>
+                    </div>
+                    <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.1); margin: 0 10px;"></div>
+                    <select id="sortSelect" class="sort-select" aria-label="Sort Articles">
+                        <option value="latest">Latest</option>
+                        <option value="unread_first">Unread First</option>
+                        <option value="read_first">Read First</option>
+                        <option value="impact">Highest Impact</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="articlesContainer"></div>
+        </main>
+
+        <aside class="right-sidebar" id="rightSidebar">
+            <div class="sidebar-section">
+                <div class="brief-header" onclick="toggleBrief()">
+                    <h3><i data-lucide="list"></i> TOP INTELLIGENCE BRIEF</h3>
+                    <i data-lucide="chevron-up" id="briefChevron" style="width:16px; transition: transform 0.3s;"></i>
+                </div>
+                <div id="topBriefWidget" class="brief-content-wrapper"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i data-lucide="gauge"></i> MARKET SENTIMENT</h3>
+                <div class="sentiment-gauge-wrapper">
+                    <div id="sentimentRadialChart"></div>
+                    <div class="sentiment-value-overlay">
+                        <div id="sentimentValue" class="sentiment-score">--</div>
+                        <div id="sentimentText" class="sentiment-text">ANALYZING</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i data-lucide="activity"></i> SYSTEM HEALTH</h3>
+                <div class="stat-grid">
+                    <div class="health-bar-container">
+                        <div class="health-label"><span>CPU LOAD</span><span style="color:#00ff9d">32%</span></div>
+                        <div class="health-progress-bg"><div class="health-progress-fill" style="width:32%"></div></div>
+                    </div>
+                    <div class="health-bar-container">
+                        <div class="health-label"><span>MEMORY</span><span style="color:#0095ff">14.2GB</span></div>
+                        <div class="health-progress-bg"><div class="health-progress-fill" style="width:45%; background:#0095ff"></div></div>
+                    </div>
+                    <div class="health-bar-container">
+                        <div class="health-label"><span>NETWORK</span><span style="color:#8a2be2">1.2GB/s</span></div>
+                        <div class="health-progress-bg"><div class="health-progress-fill" style="width:78%; background:#8a2be2"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+                    <h3 style="margin-bottom:0"><i data-lucide="bookmark"></i> QUICK SAVED</h3>
+                    <button id="downloadBriefBtn" style="background:none; border:none; color:var(--color-electric-green); cursor:pointer; font-size:0.7rem; font-weight:700; display:none; letter-spacing:0.5px;">
+                        <i data-lucide="download" size="12" style="margin-right:4px;"></i> EXPORT
+                    </button>
+                </div>
+                <div id="quickSavedList" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 12px;">
+                    <span style="color: var(--color-text-muted); font-style: italic; font-size: 0.8rem;">No bookmarks yet.</span>
+                </div>
+            </div>
+        </aside>
+
+        <footer class="app-footer">
+            <div class="footer-status">
+                <div class="footer-status-item"><div class="status-dot"></div><span>SECURE TLS v1.3</span></div>
+                <div class="footer-status-item"><span>LATENCY: <span id="footerLatency">12ms</span></span></div>
+                <div class="footer-status-item" id="sessionStatus" style="color:var(--color-electric-green); opacity:0; transition:opacity 0.5s;"><span>SESSION SAVED</span></div>
+            </div>
+            <div class="footer-center">NEXUS INTEL v4.0.2 (BETA) | © 2026</div>
+            <div class="footer-links">
+                <span class="footer-link" onclick="openInfoModal('api')">API DOCS</span>
+                <span class="footer-link" onclick="openInfoModal('logs')">SYSTEM LOGS</span>
+                <span class="footer-link" onclick="openInfoModal('privacy')">PRIVACY</span>
+                <span class="footer-link" onclick="openInfoModal('terms')">TERMS</span>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

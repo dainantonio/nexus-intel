@@ -500,8 +500,6 @@ input:checked + .slider:before { transform: translateX(22px); }
 .ai-analysis-btn:hover::after { left: 100%; }
 .ai-analysis-btn:hover { border-color: var(--color-data-blue); color: #fff; box-shadow: 0 0 15px rgba(0, 149, 255, 0.15); text-shadow: 0 0 8px rgba(0,149,255,0.5); }
 .ai-content { margin-top: 15px; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 10px; border-left: 3px solid var(--color-data-blue); font-size: 0.9rem; color: #e0e0e0; line-height: 1.6; display: none; }
-.ai-content ul { margin: 0; padding-left: 20px; }
-.ai-content li { margin-bottom: 6px; }
 .ai-content.visible { display: block; animation: fadeIn 0.3s ease; }
 
 .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }

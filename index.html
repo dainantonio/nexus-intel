@@ -18,6 +18,8 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
+
+    <script src="script.js" defer></script>
 </head>
 <body>
 
@@ -130,7 +132,8 @@
                     <button class="action-btn" onclick="document.getElementById('helpModal').classList.remove('active')" aria-label="Close Help"><i data-lucide="x"></i></button>
                 </div>
                 <div class="help-grid">
-                    <div class="help-item"><span>Search</span> <span class="help-key">Cmd + K</span></div>
+                    <div class="help-item"><span>Search Modal</span> <span class="help-key">Cmd + K</span></div>
+                    <div class="help-item"><span>Focus Search</span> <span class="help-key">/</span></div>
                     <div class="help-item"><span>Toggle View</span> <span class="help-key">V</span></div>
                     <div class="help-item"><span>Refresh Data</span> <span class="help-key">R</span></div>
                     <div class="help-item"><span>Toggle Settings</span> <span class="help-key">S</span></div>
@@ -312,8 +315,7 @@
             </div>
             <div class="sidebar-section">
                 <h3><i data-lucide="hash"></i> TRENDING SIGNALS</h3>
-                <div id="trendingContainer">
-                    </div>
+                <div id="trendingContainer"></div>
             </div>
         </aside>
 
@@ -355,8 +357,7 @@
                     <h3><i data-lucide="list"></i> TOP INTELLIGENCE BRIEF</h3>
                     <i data-lucide="chevron-up" id="briefChevron" style="width:16px; transition: transform 0.3s;"></i>
                 </div>
-                <div id="topBriefWidget" class="brief-content-wrapper">
-                    </div>
+                <div id="topBriefWidget" class="brief-content-wrapper"></div>
             </div>
 
             <div class="sidebar-section">
@@ -417,6 +418,6 @@
         </footer>
     </div>
     
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

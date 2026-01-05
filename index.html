@@ -15,6 +15,7 @@
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
     
     <!-- Knowledge Graph Library (Vis.js) -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
     
     <!-- Local CSS -->
@@ -24,10 +25,7 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js" defer></script>
     
-    <!-- Local JS -->
-    <script src="script.js" defer></script>
 </head>
 <body>
 
@@ -48,16 +46,16 @@
     <!-- Bulk Action Bar -->
     <div id="bulkActionBar" class="bulk-action-bar">
         <div class="bulk-counter">0 SELECTED</div>
-        <button class="action-btn" onclick="bulkMarkRead()" title="Mark Read"><i data-lucide="check-square"></i></button>
-        <button class="action-btn" onclick="bulkBookmark()" title="Bookmark"><i data-lucide="bookmark"></i></button>
-        <button class="action-btn" onclick="toggleBulkMode()" title="Exit Bulk Mode" style="border-color:#ff4757; color:#ff4757;"><i data-lucide="x"></i></button>
+        <button class="action-btn" onclick="app.bulkMarkRead()" title="Mark Read"><i data-lucide="check-square"></i></button>
+        <button class="action-btn" onclick="app.bulkBookmark()" title="Bookmark"><i data-lucide="bookmark"></i></button>
+        <button class="action-btn" onclick="app.toggleBulkMode()" title="Exit Bulk Mode" style="border-color:#ff4757; color:#ff4757;"><i data-lucide="x"></i></button>
     </div>
 
     <!-- Zen Mode Overlay -->
     <div id="zenModeOverlay" class="zen-overlay">
         <div class="zen-container">
             <div class="zen-header">
-                <button class="action-btn" onclick="toggleZenMode()" title="Exit Zen Mode"><i data-lucide="x"></i></button>
+                <button class="action-btn" onclick="app.toggleZenMode()" title="Exit Zen Mode"><i data-lucide="x"></i></button>
                 <div class="zen-controls">
                     <button class="action-btn" id="zenFontDecrease" title="Decrease Font Size"><i data-lucide="minus"></i></button>
                     <button class="action-btn" id="zenFontIncrease" title="Increase Font Size"><i data-lucide="plus"></i></button>
@@ -81,7 +79,7 @@
                     </div>
                     <div class="graph-controls">
                         <button class="action-btn" id="graphResetView" title="Reset View"><i data-lucide="refresh-cw"></i></button>
-                        <button class="action-btn" id="graphZoomIn" title="Zoom In"><i data-lide="zoom-in"></i></button>
+                        <button class="action-btn" id="graphZoomIn" title="Zoom In"><i data-lucide="zoom-in"></i></button>
                         <button class="action-btn" id="graphZoomOut" title="Zoom Out"><i data-lucide="zoom-out"></i></button>
                         <button class="action-btn" id="closeGraphBtn" title="Close"><i data-lucide="x"></i></button>
                     </div>
@@ -229,30 +227,212 @@
         </div>
     </div>
 
-    <!-- Existing Modals (Search, Reader, Info, Help, Settings) remain the same -->
     <!-- Search Modal -->
     <div class="modal-overlay" id="searchModal">
-        <!-- ... existing search modal code ... -->
+        <div class="modal-content">
+            <div class="search-container">
+                <div class="search-header">
+                    <i data-lucide="search" style="color: var(--color-electric-green);"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search global intelligence..." aria-label="Search" autocomplete="off">
+                    <button class="action-btn" id="closeSearchBtn" aria-label="Close Search"><i data-lucide="x"></i></button>
+                </div>
+                <div class="search-results" id="searchResults">
+                    <!-- Populated via JS -->
+                </div>
+                <div class="search-footer">
+                    <span><i data-lucide="arrow-up" size="12"></i> <i data-lucide="arrow-down" size="12"></i> to navigate</span>
+                    <span><i data-lucide="corner-down-left" size="12"></i> to select</span>
+                    <span><span style="border: 1px solid #333; padding: 2px 6px; border-radius: 4px;">ESC</span> to close</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Reader Modal -->
     <div class="modal-overlay" id="readerModal">
-        <!-- ... existing reader modal code ... -->
+        <div class="modal-content">
+            <div class="reader-container">
+                <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                    <button class="action-btn" onclick="document.getElementById('readerModal').classList.remove('active')" aria-label="Close Reader"><i data-lucide="x"></i></button>
+                </div>
+                <h1 id="readerTitle" class="reader-title">Article Title</h1>
+                <div class="reader-meta">
+                    <span id="readerSource">Source</span>
+                    <span>•</span>
+                    <span id="readerTime">Time</span>
+                    <span id="readerTag" class="reader-badge">TAG</span>
+                </div>
+                <div id="readerBody" class="reader-content"></div>
+                <div style="margin-top: 30px; border-top: 1px solid var(--color-border); padding-top: 20px;">
+                    <h3 style="color: var(--color-electric-green); font-size: 0.9rem; margin-bottom: 10px;">INTELLIGENCE SUMMARY</h3>
+                    <div id="readerAiSummary" style="font-size: 0.95rem; color: #aaa; background: rgba(0,255,157,0.05); padding: 15px; border-radius: 8px;"></div>
+                </div>
+                <div style="margin-top: 20px; display:flex; justify-content:center;">
+                    <button class="ai-analysis-btn" id="readerExternalLink" style="width: auto; padding: 10px 25px;">OPEN ORIGINAL SOURCE <i data-lucide="external-link" size="14"></i></button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Info/Docs Modal -->
     <div class="modal-overlay" id="infoModal">
-        <!-- ... existing info modal code ... -->
+        <div class="modal-content">
+            <div class="info-container">
+                <div class="info-header">
+                    <div class="info-tabs">
+                        <div class="info-tab active" data-tab="api">API DOCS</div>
+                        <div class="info-tab" data-tab="logs">SYSTEM LOGS</div>
+                        <div class="info-tab" data-tab="privacy">PRIVACY</div>
+                        <div class="info-tab" data-tab="terms">TERMS</div>
+                    </div>
+                    <button class="action-btn" id="closeInfoBtn"><i data-lucide="x"></i></button>
+                </div>
+                <div class="info-body">
+                    <div id="tab-api" class="info-section active">
+                        <h3 style="margin-bottom:15px; color:white;">Nexus API v4.0.2</h3>
+                        <p style="color:#aaa; font-size:0.9rem; margin-bottom:10px;">Access the global intelligence stream programmatically.</p>
+                        <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:8px; font-family:'JetBrains Mono'; color:#00ff9d; font-size:0.8rem; margin-bottom:20px;">
+                            GET https://api.nexus-intel.io/v1/stream/latest<br>
+                            Authorization: Bearer YOUR_API_KEY
+                        </div>
+                        <p style="color:#aaa; font-size:0.9rem;">Rate limits: 500 req/min for Enterprise tier.</p>
+                    </div>
+                    <div id="tab-logs" class="info-section">
+                        <h3 style="margin-bottom:15px; color:white;">System Event Stream</h3>
+                        <div id="systemLogContainer" style="height:300px; overflow-y:auto; background:rgba(0,0,0,0.3); padding:15px; border-radius:8px;"></div>
+                    </div>
+                    <div id="tab-privacy" class="info-section">
+                        <h3 style="margin-bottom:15px; color:white;">Data Privacy Protocol</h3>
+                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">Nexus Intel operates on a zero-retention policy for user search queries. All geospatial data is anonymized before aggregation. We adhere to GDPR and CCPA compliance standards for all data vectors.</p>
+                    </div>
+                    <div id="tab-terms" class="info-section">
+                        <h3 style="margin-bottom:15px; color:white;">Terms of Service</h3>
+                        <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">By accessing the NEXUS mainframe, you agree to utilize the intelligence provided for lawful predictive analysis only. Market manipulation based on simulated signals is strictly prohibited.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Help Modal -->
     <div class="modal-overlay" id="helpModal">
-        <!-- ... existing help modal code ... -->
+        <div class="modal-content">
+            <div class="settings-container">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+                    <h2><i data-lucide="keyboard" style="color: var(--color-electric-green); margin-right: 10px;"></i> Shortcuts</h2>
+                    <button class="action-btn" onclick="document.getElementById('helpModal').classList.remove('active')" aria-label="Close Help"><i data-lucide="x"></i></button>
+                </div>
+                <div class="help-grid">
+                    <div class="help-item"><span>Search</span> <span class="help-key">Cmd + K</span></div>
+                    <div class="help-item"><span>Zen Mode</span> <span class="help-key">Z</span></div>
+                    <div class="help-item"><span>Knowledge Graph</span> <span class="help-key">G</span></div>
+                    <div class="help-item"><span>Startup Tracker</span> <span class="help-key">T</span></div>
+                    <div class="help-item"><span>Toggle View</span> <span class="help-key">V</span></div>
+                    <div class="help-item"><span>Refresh Data</span> <span class="help-key">R</span></div>
+                    <div class="help-item"><span>Toggle Settings</span> <span class="help-key">S</span></div>
+                    <div class="help-item"><span>Bulk Mode</span> <span class="help-key">B</span></div>
+                    <div class="help-item"><span>Mark Read</span> <span class="help-key">M</span></div>
+                    <div class="help-item"><span>Mark All Read</span> <span class="help-key">Shift + M</span></div>
+                    <div class="help-item"><span>Close Modals</span> <span class="help-key">Esc</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
-        <!-- ... existing settings modal code ... -->
+        <div class="modal-content">
+            <div class="settings-container">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+                    <h2><i data-lucide="settings" style="color: var(--color-electric-green); margin-right: 10px;"></i> System Config</h2>
+                    <button class="action-btn" id="closeSettingsBtn" aria-label="Close Settings"><i data-lucide="x"></i></button>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="eye"></i> Interface</h3>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Cyberpunk Mode</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Scanlines & CRT effects</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="cyberpunkToggle"><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Default View Mode</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Preferred dashboard layout</div>
+                        </div>
+                         <select id="defaultViewSelect" style="background: rgba(0,0,0,0.3); border: 1px solid var(--color-border); padding: 5px 10px; color: white; border-radius: 4px;">
+                            <option value="row">Row View</option>
+                            <option value="grid">Grid View</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Auto-Mark Read</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Mark read when opening</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="autoMarkReadToggle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Accent Color</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Primary theme color</div>
+                        </div>
+                        <input type="color" id="accentColorPicker" class="color-picker-input" value="#00ff9d">
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="filter"></i> Intelligence Filters</h3>
+                    <div class="setting-item" style="display:block;">
+                         <div style="font-weight: 500;">Highlight Keywords</div>
+                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Visually tag signals (comma separated)</div>
+                         <div class="keyword-input-container">
+                             <input type="text" id="newHighlightInput" class="setting-input" placeholder="e.g. nvidia, fusion" style="margin-top:0;">
+                             <button id="addHighlightBtn" class="action-btn" style="width: 40px; height: 38px; border-radius: 6px;"><i data-lucide="plus"></i></button>
+                         </div>
+                         <div id="highlightKeywordsList" class="keyword-tags"></div>
+                    </div>
+                    <div class="setting-item" style="display:block;">
+                         <div style="font-weight: 500;">Muted Keywords</div>
+                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Hide signals containing these words</div>
+                         <div class="keyword-input-container">
+                             <input type="text" id="newKeywordInput" class="setting-input" placeholder="e.g. crypto, gossip" style="margin-top:0;">
+                             <button id="addKeywordBtn" class="action-btn" style="width: 40px; height: 38px; border-radius: 6px;"><i data-lucide="plus"></i></button>
+                         </div>
+                         <div id="mutedKeywordsList" class="keyword-tags"></div>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="bell"></i> Data Stream</h3>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Breaking News Alerts</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Top banner for high impact events</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="breakingNewsToggle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-item">
+                         <button id="forceBreakingBtn" style="width:100%; padding:10px; background:rgba(255, 71, 87, 0.1); color:#ff4757; border:1px solid #ff4757; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.8rem;">
+                            <i data-lucide="alert-triangle" size="14" style="margin-right:5px;"></i> SIMULATE BREAKING EVENT
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div style="font-weight: 500;">Live Simulation</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted);">Inject mock events every 45s</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="liveSimToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3><i data-lucide="key"></i> API Configuration</h3>
+                    <input type="password" id="geminiKey" class="setting-input" placeholder="Gemini API Key">
+                    <input type="password" id="newsApiKey" class="setting-input" placeholder="NewsAPI Key">
+                    <input type="password" id="gnewsApiKey" class="setting-input" placeholder="GNews API Key">
+                </div>
+                <button id="saveSettingsBtn" style="width: 100%; padding: 14px; background: var(--color-electric-green); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #000;">SAVE CONFIGURATION</button>
+            </div>
+        </div>
     </div>
 
     <!-- Signal Ticker -->
@@ -374,7 +554,7 @@
         <!-- Right Sidebar -->
         <aside class="right-sidebar" id="rightSidebar">
             <div class="sidebar-section">
-                <div class="brief-header" onclick="toggleBrief()">
+                <div class="brief-header" onclick="app.toggleBrief()">
                     <h3><i data-lucide="list"></i> TOP INTELLIGENCE BRIEF</h3>
                     <i data-lucide="chevron-up" id="briefChevron" style="width:16px; transition: transform 0.3s;"></i>
                 </div>
@@ -411,7 +591,7 @@
                     </div>
                 </div>
                 <div style="margin-top: 15px;">
-                    <button class="ai-analysis-btn" onclick="openStartupDashboard()" style="font-size: 0.7rem; padding: 8px;">
+                    <button class="ai-analysis-btn" onclick="app.openStartupDashboard()" style="font-size: 0.7rem; padding: 8px;">
                         <i data-lucide="rocket"></i> OPEN STARTUP TRACKER
                     </button>
                 </div>
@@ -438,15 +618,17 @@
                 <div class="footer-status-item" id="sessionStatus" style="color:var(--color-electric-green); opacity:0; transition:opacity 0.5s;"><span>SESSION SAVED</span></div>
                 <div class="footer-status-item" id="zenStatus" style="color:var(--color-data-blue); display:none;"><i data-lucide="moon" size="12"></i> ZEN MODE: READY</div>
             </div>
-            <div class="footer-center">NEXUS INTEL v4.1.0 (BETA) | © 2026</div>
+            <div class="footer-center">NEXUS INTEL v4.1.0 | © 2026</div>
             <div class="footer-links">
-                <span class="footer-link" onclick="openInfoModal('api')">API DOCS</span>
-                <span class="footer-link" onclick="openKnowledgeGraph()">KNOWLEDGE GRAPH</span>
-                <span class="footer-link" onclick="openStartupDashboard()">STARTUP TRACKER</span>
-                <span class="footer-link" onclick="openInfoModal('privacy')">PRIVACY</span>
+                <span class="footer-link" onclick="app.openInfoModal('api')">API DOCS</span>
+                <span class="footer-link" onclick="app.openKnowledgeGraph()">KNOWLEDGE GRAPH</span>
+                <span class="footer-link" onclick="app.openStartupDashboard()">STARTUP TRACKER</span>
+                <span class="footer-link" onclick="app.openInfoModal('privacy')">PRIVACY</span>
             </div>
         </footer>
     </div>
 
+    <!-- Local JS -->
+    <script src="script.js"></script>
 </body>
 </html>

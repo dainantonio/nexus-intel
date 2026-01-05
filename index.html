@@ -20,17 +20,17 @@
     <style>
         /* ===== CORE VARIABLES ===== */
         :root {
-            --color-bg-dark: #0a0a0f;
-            --color-bg-card: #13131f; 
-            --color-bg-sidebar: #0e0e15;
+            --color-bg-dark: #08080a; 
+            --color-bg-card: #111116; 
+            --color-bg-sidebar: #0b0b0e;
             /* Default accent color, can be overridden by JS */
             --color-electric-green: #00ff9d; 
             --color-data-blue: #0095ff;
             --color-accent-purple: #8a2be2;
             --color-alert-red: #ff4757;
             --color-realestate-orange: #ff9f43;
-            --color-startup-pink: #ff00ff; /* New color for startups */
-            --color-infra-cyan: #00e5ff;   /* New color for infra */
+            --color-startup-pink: #ff00ff; 
+            --color-infra-cyan: #00e5ff;   
             --color-text-primary: #ffffff;
             --color-text-secondary: #b0b0c0;
             --color-text-muted: #7a7a8a;
@@ -48,7 +48,7 @@
             
             --scanline-color: rgba(0, 255, 157, 0.03);
             
-            --header-height: 70px; /* Defined for sticky calculations */
+            --header-height: 70px; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,12 +81,12 @@
             border-bottom: 1px solid var(--color-border);
             overflow: hidden;
             position: relative;
-            height: 36px; /* Slightly smaller */
+            height: 36px;
             display: flex;
             align-items: center;
             font-family: 'JetBrains Mono', monospace;
             contain: layout size;
-            z-index: 102; /* Above header */
+            z-index: 102;
         }
         .ticker-wrap { width: 100%; overflow: hidden; position: relative; }
         .ticker { 
@@ -274,16 +274,30 @@
         /* ===== LAYOUT ===== */
         .app-container {
             display: grid;
-            /* Defined columns for desktop */
             grid-template-columns: 300px 1fr 360px;
-            /* Header (fixed), Filters (fixed/sticky), Content (scroll) */
-            grid-template-rows: auto auto 1fr auto; 
+            grid-template-rows: auto auto 1fr auto;
             min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* ZEN MODE STYLES */
+        .zen-mode .app-container {
+            grid-template-columns: 0 1fr 0;
+        }
+        .zen-mode .left-sidebar, .zen-mode .right-sidebar {
+            display: none;
+        }
+        .zen-mode .main-feed {
+            max-width: 900px;
+            margin: 0 auto;
+            border-left: 1px solid var(--color-border);
+            border-right: 1px solid var(--color-border);
+            padding: 2rem 4rem;
         }
 
         .app-header {
             grid-column: 1 / -1;
-            background: rgba(10, 10, 15, 0.95); /* Slightly more opaque */
+            background: rgba(10, 10, 15, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--color-border); 
             padding: 0 2rem;
@@ -294,7 +308,6 @@
         .logo-container { display: flex; align-items: center; gap: 12px; }
         .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--color-electric-green), var(--color-data-blue)); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0,255,157,0.3); }
         
-        /* New Center Intel Section */
         .header-intel { display: flex; gap: 20px; align-items: center; }
         .header-intel-item { display: flex; flex-direction: column; align-items: flex-start; }
         .intel-label { font-size: 0.65rem; color: var(--color-text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -305,15 +318,14 @@
         .action-btn { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
         .action-btn:hover, .action-btn.active { background: var(--color-electric-green); color: var(--color-bg-dark); border-color: var(--color-electric-green); box-shadow: 0 0 15px rgba(0,255,157,0.2); }
         
-        /* Filter Container - Sticky below header */
         .filter-container { 
             grid-column: 1 / -1; 
             padding: 1rem 2rem; 
             display: flex; gap: 10px; flex-wrap: wrap; 
-            background: rgba(10,10,15,0.9); /* Slightly transparent */
+            background: rgba(10,10,15,0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--color-border);
-            position: sticky; top: var(--header-height); /* Stick right below header */
+            position: sticky; top: var(--header-height); 
             z-index: 90;
         }
         .filter-chip { padding: 0.6rem 1.4rem; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); letter-spacing: 0.5px; }
@@ -337,7 +349,6 @@
         .trending-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
         .trending-fill { height: 100%; background: var(--color-electric-green); border-radius: 2px; }
 
-        /* New Widget Items (Startups & Infra) */
         .widget-item { padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 10px; border: 1px solid transparent; transition: all 0.2s; }
         .widget-item:hover { background: rgba(255,255,255,0.05); transform: translateX(3px); border-color: rgba(255,255,255,0.1); }
         .widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
@@ -345,8 +356,6 @@
         .widget-meta { font-size: 0.7rem; font-family: 'JetBrains Mono'; color: var(--color-text-muted); }
         .widget-details { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
         .widget-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--color-text-secondary); text-transform: uppercase; }
-
-        /* Custom Styles for Infra Widget */
         .infra-progress { height: 4px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 8px; overflow: hidden; }
         .infra-bar { height: 100%; background: var(--color-infra-cyan); border-radius: 2px; }
 
@@ -355,20 +364,18 @@
         .feed-controls { display: flex; gap: 10px; align-items: center; }
         .sort-select { background: rgba(255,255,255,0.05); color: var(--color-text-primary); border: 1px solid var(--color-border); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer; }
         
-        /* View Toggle Styles */
-        .view-toggle { display: flex; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; border: 1px solid var(--color-border); }
-        .view-btn { background: transparent; border: none; color: var(--color-text-muted); padding: 6px 10px; cursor: pointer; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .view-btn.active { background: var(--color-electric-green); color: var(--color-bg-dark); }
-        .view-btn:hover:not(.active) { color: white; background: rgba(255,255,255,0.1); }
+        .display-controls { display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; border: 1px solid var(--color-border); }
+        .display-btn { background: transparent; border: none; color: var(--color-text-muted); padding: 6px 10px; cursor: pointer; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+        .display-btn.active { background: var(--color-electric-green); color: var(--color-bg-dark); font-weight: 700; box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); }
+        .display-btn:hover:not(.active) { color: white; background: rgba(255,255,255,0.1); }
+        .control-separator { width: 1px; height: 18px; background: rgba(255,255,255,0.1); margin: 0 4px; }
 
-        /* ===== REDESIGNED CARD UI ===== */
         .news-card { 
             background: rgba(20, 20, 28, 0.6); 
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: var(--border-radius); 
-            padding: 0; /* Reset padding for visual header */
+            padding: 0; 
             margin-bottom: 1.8rem; 
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -380,171 +387,65 @@
             flex-direction: column;
         }
 
-        /* Read/Unread State */
-        .news-card.unread {
-            border-color: rgba(0, 255, 157, 0.4);
-            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-        }
-        .news-card.read {
-            opacity: 0.6;
-            filter: grayscale(0.8);
-            border-color: transparent;
-            box-shadow: none;
-        }
+        .news-card.unread { border-color: rgba(0, 255, 157, 0.4); box-shadow: 0 0 15px rgba(0, 255, 157, 0.1); }
+        .news-card.read { opacity: 0.6; filter: grayscale(0.8); border-color: transparent; box-shadow: none; }
         .news-card.read:hover { opacity: 1; border-color: var(--color-border); filter: grayscale(0); }
 
-        /* Bulk Mode */
         .bulk-mode-active .news-card { cursor: pointer; }
-        .bulk-checkbox {
-            position: absolute; top: 15px; left: 15px; z-index: 10;
-            width: 24px; height: 24px; border: 2px solid var(--color-border);
-            background: rgba(0,0,0,0.8); border-radius: 6px; display: none;
-            align-items: center; justify-content: center; color: var(--color-electric-green);
-            transition: all 0.2s;
-        }
+        .bulk-checkbox { position: absolute; top: 15px; left: 15px; z-index: 10; width: 24px; height: 24px; border: 2px solid var(--color-border); background: rgba(0,0,0,0.8); border-radius: 6px; display: none; align-items: center; justify-content: center; color: var(--color-electric-green); transition: all 0.2s; }
         .bulk-mode-active .bulk-checkbox { display: flex; }
         .bulk-checkbox.checked { background: var(--color-electric-green); color: #000; border-color: var(--color-electric-green); }
         
-        .bulk-action-bar {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px);
-            background: rgba(26, 26, 46, 0.95); border: 1px solid var(--color-electric-green);
-            padding: 12px 30px; border-radius: 50px; display: flex; gap: 15px; align-items: center;
-            z-index: 10005; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6); backdrop-filter: blur(10px);
-        }
+        .bulk-action-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: rgba(26, 26, 46, 0.95); border: 1px solid var(--color-electric-green); padding: 12px 30px; border-radius: 50px; display: flex; gap: 15px; align-items: center; z-index: 10005; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 40px rgba(0,0,0,0.6); backdrop-filter: blur(10px); }
         .bulk-action-bar.visible { transform: translateX(-50%) translateY(0); }
         .bulk-counter { font-family: 'JetBrains Mono'; font-weight: 700; color: #fff; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 20px; margin-right: 5px; }
 
-        /* Keyword Highlight */
-        .keyword-highlight { background: rgba(0, 149, 255, 0.2); color: #fff; padding: 0 2px; border-radius: 2px; font-weight: 700; border-bottom: 2px solid rgba(0,149,255,0.5); }
+        .visual-header { height: 120px; width: 100%; position: relative; background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .visual-header::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(0deg, rgba(0,0,0,0.5), transparent); background-size: 20px 20px, 100% 100%; }
+        .visual-icon-container { position: absolute; bottom: -24px; right: 24px; left: auto; width: 48px; height: 48px; background: var(--color-bg-card); border: 2px solid var(--color-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--color-electric-green); z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        /* Filter Chip Badges */
-        .chip-badge { font-size: 0.65rem; background: var(--color-electric-green); color: #000; padding: 1px 6px; border-radius: 4px; margin-left: 5px; font-weight: 800; display: none; }
-        .chip-badge.visible { display: inline-block; }
-
-        /* Visual Header (Rich Preview Sim) */
-        .visual-header {
-            height: 120px;
-            width: 100%;
-            position: relative;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-        }
-        .visual-header::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(0,0,0,0.5), transparent);
-            background-size: 20px 20px, 100% 100%;
-        }
-        .visual-icon-container {
-            position: absolute; bottom: -24px; right: 24px; left: auto;
-            width: 48px; height: 48px;
-            background: var(--color-bg-card);
-            border: 2px solid var(--color-border);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--color-electric-green);
-            z-index: 2;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        /* Category Specific Visuals */
         .news-card[data-category="ai"] .visual-header { background: linear-gradient(135deg, rgba(0,149,255,0.2), rgba(0,149,255,0.05)); }
         .news-card[data-category="ai"] .visual-icon-container { color: var(--color-data-blue); border-color: rgba(0,149,255,0.3); }
-
         .news-card[data-category="energy"] .visual-header { background: linear-gradient(135deg, rgba(0,255,157,0.2), rgba(0,255,157,0.05)); }
         .news-card[data-category="energy"] .visual-icon-container { color: var(--color-electric-green); border-color: rgba(0,255,157,0.3); }
-        
         .news-card[data-category="policy"] .visual-header { background: linear-gradient(135deg, rgba(138,43,226,0.2), rgba(138,43,226,0.05)); }
         .news-card[data-category="policy"] .visual-icon-container { color: var(--color-accent-purple); border-color: rgba(138,43,226,0.3); }
-
         .news-card[data-category="realestate"] .visual-header { background: linear-gradient(135deg, rgba(255,159,67,0.2), rgba(255,159,67,0.05)); }
         .news-card[data-category="realestate"] .visual-icon-container { color: var(--color-realestate-orange); border-color: rgba(255,159,67,0.3); }
-
-        .news-card[data-category="startups"] .visual-header { background: linear-gradient(135deg, rgba(255,0,255,0.2), rgba(255,0,255,0.05)); }
-        .news-card[data-category="startups"] .visual-icon-container { color: var(--color-startup-pink); border-color: rgba(255,0,255,0.3); }
-
-        .news-card[data-category="infrastructure"] .visual-header { background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,229,255,0.05)); }
-        .news-card[data-category="infrastructure"] .visual-icon-container { color: var(--color-infra-cyan); border-color: rgba(0,229,255,0.3); }
-        
         .news-card.breaking .visual-header { background: linear-gradient(135deg, rgba(255,71,87,0.3), rgba(255,71,87,0.1)); }
         .news-card.breaking .visual-icon-container { color: var(--color-alert-red); border-color: rgba(255,71,87,0.3); }
 
         .card-body { padding: 1.8rem; padding-top: 1.5rem; }
-
-        /* Glowing Border & Hover Effects */
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(0, 255, 157, 0.3);
-            box-shadow: 0 10px 40px -10px rgba(0, 255, 157, 0.15), inset 0 0 20px rgba(0, 255, 157, 0.02);
-        }
+        .news-card:hover { transform: translateY(-5px); border-color: rgba(0, 255, 157, 0.3); box-shadow: 0 10px 40px -10px rgba(0, 255, 157, 0.15), inset 0 0 20px rgba(0, 255, 157, 0.02); }
         
-        /* Category Corner Indicator */
-        .card-corner-indicator {
-            position: absolute; top: 0; right: 0; left: auto; width: 0; height: 0;
-            border-style: solid; border-width: 0 50px 50px 0;
-            border-color: transparent rgba(255,255,255,0.05) transparent transparent;
-            transition: border-color 0.3s; pointer-events: none;
-            z-index: 3;
-        }
+        .card-corner-indicator { position: absolute; top: 0; right: 0; left: auto; width: 0; height: 0; border-style: solid; border-width: 0 50px 50px 0; border-color: transparent rgba(255,255,255,0.05) transparent transparent; transition: border-color 0.3s; pointer-events: none; z-index: 3; }
         .news-card[data-category="ai"] .card-corner-indicator { border-right-color: rgba(0, 149, 255, 0.2); }
         .news-card[data-category="energy"] .card-corner-indicator { border-right-color: rgba(0, 255, 157, 0.2); }
         .news-card[data-category="policy"] .card-corner-indicator { border-right-color: rgba(138, 43, 226, 0.2); }
         .news-card[data-category="realestate"] .card-corner-indicator { border-right-color: rgba(255, 159, 67, 0.2); }
-        .news-card[data-category="startups"] .card-corner-indicator { border-right-color: rgba(255, 0, 255, 0.2); }
-        .news-card[data-category="infrastructure"] .card-corner-indicator { border-right-color: rgba(0, 229, 255, 0.2); }
         .news-card[data-category="breaking"] .card-corner-indicator { border-right-color: rgba(255, 71, 87, 0.4); }
         
-        .card-corner-letter {
-            position: absolute; top: 8px; right: 8px; left: auto; font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem; font-weight: 800; color: rgba(255,255,255,0.6); pointer-events: none;
-        }
-
-        /* Impact Badge */
-        .impact-badge-strip {
-            position: absolute; left: 0; top: 20px;
-            background: var(--color-alert-red); color: white;
-            font-size: 0.6rem; font-weight: 800; padding: 2px 8px;
-            text-transform: uppercase; border-top-right-radius: 4px; border-bottom-right-radius: 4px;
-            box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
-            display: none; z-index: 5;
-        }
+        .card-corner-letter { position: absolute; top: 8px; right: 8px; left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 800; color: rgba(255,255,255,0.6); pointer-events: none; }
+        .impact-badge-strip { position: absolute; left: 0; top: 20px; background: var(--color-alert-red); color: white; font-size: 0.6rem; font-weight: 800; padding: 2px 8px; text-transform: uppercase; border-top-right-radius: 4px; border-bottom-right-radius: 4px; box-shadow: 0 0 10px rgba(255, 71, 87, 0.4); display: none; z-index: 5; }
         .news-card.breaking .impact-badge-strip { display: block; animation: pulseRed 2s infinite; }
         @keyframes pulseRed { 0% { opacity: 0.8; } 50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 71, 87, 0.6); } 100% { opacity: 0.8; } }
-
-        /* Sparkline */
         .sparkline-svg { vertical-align: middle; margin-left: 8px; overflow: visible; }
         .sparkline-path { fill: none; stroke: var(--color-realestate-orange); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 
-        /* Existing Card Styles Refined */
         .card-header { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
         .card-title { font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem; cursor: pointer; line-height: 1.3; color: #fff; text-transform: uppercase; letter-spacing: -0.5px; transition: color 0.2s; }
         .card-title:hover { color: var(--color-electric-green); text-shadow: 0 0 20px rgba(0,255,157,0.3); }
         .card-meta-line { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace; }
         .card-summary { color: #ccc; margin-bottom: 1.2rem; font-size: 0.95rem; line-height: 1.6; font-weight: 400; opacity: 0.9; }
         
-        /* Compact/Grid View Adjustments */
-        #articlesContainer.grid-view {
-            display: grid;
-            /* Optimized for responsiveness: uses 260px to ensure 2 columns on most laptops */
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-        }
-        #articlesContainer.grid-view .news-card {
-            margin-bottom: 0;
-            padding: 0;
-            display: flex; 
-            flex-direction: column;
-            height: 100%;
-        }
+        #articlesContainer.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; width: 100%; }
+        #articlesContainer.grid-view .news-card { margin-bottom: 0; padding: 0; display: flex; flex-direction: column; height: 100%; }
         #articlesContainer.grid-view .visual-header { height: 100px; }
         #articlesContainer.grid-view .card-title { font-size: 1.15rem; }
         #articlesContainer.grid-view .card-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.9rem; margin-bottom: auto; }
         #articlesContainer.grid-view .ai-analysis-container { margin-top: 1rem; padding-top: 1rem; }
         #articlesContainer.grid-view .card-footer { margin-top: 1rem; }
         
-        /* AI Analysis Section Enhanced */
         .ai-analysis-container { margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem; }
         .ai-analysis-btn { background: linear-gradient(90deg, rgba(0, 149, 255, 0.08) 0%, rgba(0, 149, 255, 0.02) 100%); color: var(--color-data-blue); border: 1px solid rgba(0, 149, 255, 0.2); width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 0.75rem; transition: var(--transition); letter-spacing: 1px; text-transform: uppercase; overflow: hidden; position: relative; }
         .ai-analysis-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: 0.5s; }
@@ -679,6 +580,9 @@
             font-family: 'JetBrains Mono';
         }
 
+        /* Graph Modal */
+        #graphCanvas { background: #08080a; width: 100%; height: 500px; border-radius: 4px; border: 1px solid var(--color-border); }
+
         /* Mobile Widget Drawer & Visibility */
         .mobile-widgets-btn { display: none; }
         
@@ -698,6 +602,7 @@
                 border-left: 1px solid var(--color-border);
                 box-shadow: -10px 0 30px rgba(0,0,0,0.5);
                 animation: slideInRight 0.3s ease;
+                background-color: var(--color-bg-sidebar);
             }
         }
         @media (max-width: 768px) { 
@@ -780,6 +685,19 @@
             </div>
         </div>
     </div>
+    
+    <!-- Graph Modal -->
+    <div class="modal-overlay" id="graphModal">
+        <div class="modal-content" style="max-width:800px; height:600px;">
+            <div class="settings-container">
+                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h2>Knowledge Graph</h2>
+                    <button class="action-btn" onclick="document.getElementById('graphModal').classList.remove('active')"><i data-lucide="x"></i></button>
+                </div>
+                <canvas id="graphCanvas"></canvas>
+            </div>
+        </div>
+    </div>
 
     <!-- Info/Docs Modal -->
     <div class="modal-overlay" id="infoModal">
@@ -795,30 +713,13 @@
                     <button class="action-btn" id="closeInfoBtn"><i data-lucide="x"></i></button>
                 </div>
                 <div class="info-body">
-            <div id="tab-api" class="info-section active">
-                <h3 style="margin-bottom:15px; color:white;">Nexus API v4.0.2</h3>
-                <p style="color:#aaa; font-size:0.9rem; margin-bottom:10px;">Access the global intelligence stream programmatically.</p>
-                <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:8px; font-family:'JetBrains Mono'; color:#00ff9d; font-size:0.8rem; margin-bottom:20px;">
-                    GET https://api.nexus-intel.io/v1/stream/latest<br>
-                    Authorization: Bearer YOUR_API_KEY
-                </div>
-                <p style="color:#aaa; font-size:0.9rem;">Rate limits: 500 req/min for Enterprise tier.</p>
-            </div>
-            <div id="tab-logs" class="info-section">
-                <h3 style="margin-bottom:15px; color:white;">System Event Stream</h3>
-                <div id="systemLogContainer" style="height:300px; overflow-y:auto; background:rgba(0,0,0,0.3); padding:15px; border-radius:8px;"></div>
-            </div>
-            <div id="tab-privacy" class="info-section">
-                <h3 style="margin-bottom:15px; color:white;">Data Privacy Protocol</h3>
-                <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">Nexus Intel operates on a zero-retention policy for user search queries. All geospatial data is anonymized before aggregation. We adhere to GDPR and CCPA compliance standards for all data vectors.</p>
-            </div>
-            <div id="tab-terms" class="info-section">
-                <h3 style="margin-bottom:15px; color:white;">Terms of Service</h3>
-                <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">By accessing the NEXUS mainframe, you agree to utilize the intelligence provided for lawful predictive analysis only. Market manipulation based on simulated signals is strictly prohibited.</p>
-            </div>
-        </div>
-    </div>
-</div>
+                    <div id="tab-api" class="info-section active">
+                        <h3 style="margin-bottom:15px; color:white;">Nexus API v4.0.2</h3>
+                        <p style="color:#aaa; font-size:0.9rem; margin-bottom:10px;">Access the global intelligence stream programmatically.</p>
+                        <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:8px; font-family:'JetBrains Mono'; color:#00ff9d; font-size:0.8rem; margin-bottom:20px;">
+                            GET https://api.nexus-intel.io/v1/stream/latest<br>
+                            Authorization: Bearer YOUR_API_KEY
+                        </div>
                         <p style="color:#aaa; font-size:0.9rem;">Rate limits: 500 req/min for Enterprise tier.</p>
                     </div>
                     <div id="tab-logs" class="info-section">
@@ -1000,15 +901,15 @@
 
             <div class="header-actions">
                 <button class="action-btn mobile-widgets-btn" id="mobileWidgetsToggle" title="Toggle Widgets"><i data-lucide="bar-chart-2"></i></button>
-                <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode" aria-label="TLDR Mode"><i data-lucide="list"></i></button>
                 <div id="systemClock" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--color-electric-green); border: 1px solid rgba(0,255,157,0.2); padding: 8px 12px; border-radius: 8px; margin-right: 10px;">00:00:00 UTC</div>
+                <!-- NEW BUTTONS -->
+                <button class="action-btn" id="zenModeToggle" title="Zen Mode"><i data-lucide="maximize-2"></i></button>
+                <button class="action-btn" id="graphModeToggle" title="Knowledge Graph"><i data-lucide="network"></i></button>
                 <button class="action-btn" id="refreshBtn" title="Refresh Feed" aria-label="Refresh"><i data-lucide="refresh-cw"></i></button>
                 <button class="action-btn" id="triggerSearchBtn" title="Search (Cmd+K)" aria-label="Search"><i data-lucide="search"></i></button>
                 <button class="action-btn" id="triggerSettingsBtn" title="Settings (S)" aria-label="Settings"><i data-lucide="settings"></i></button>
             </div>
         </header>
-
-        <!-- No separate intelligence-aggregator div anymore -->
 
         <div class="filter-container">
             <div class="filter-chip active" data-filter="all"><i data-lucide="layers" size="14"></i> ALL NEXUS <span class="filter-chip-count"></span><span id="badge-all" class="chip-badge"></span></div>
@@ -1061,11 +962,18 @@
                     <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px;"><span id="articleCount">0</span> NODES</span>
                 </div>
                 <div class="feed-controls">
-                     <div class="view-toggle">
-                        <button class="view-btn active" data-view="row" title="Row View"><i data-lucide="rows" size="16"></i></button>
-                        <button class="view-btn" data-view="grid" title="Grid View"><i data-lucide="layout-grid" size="16"></i></button>
+                     <!-- New Strategic Grouping -->
+                     <div class="display-controls">
+                        <button id="tldrToggleBtn" class="display-btn" title="Toggle TL;DR Brief">
+                            <i data-lucide="list-collapse" size="16" style="margin-right:6px;"></i> TL;DR
+                        </button>
+                        <div class="control-separator"></div>
+                        <button class="display-btn view-btn active" data-view="row" title="Row View"><i data-lucide="rows" size="16"></i></button>
+                        <button class="display-btn view-btn" data-view="grid" title="Grid View"><i data-lucide="layout-grid" size="16"></i></button>
                     </div>
+
                     <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.1); margin: 0 10px;"></div>
+                    
                     <select id="sortSelect" class="sort-select" aria-label="Sort Articles">
                         <option value="latest">Latest</option>
                         <option value="unread_first">Unread First</option>
@@ -1173,6 +1081,7 @@
             logInterval: null,
             tldrMode: false,
             briefCollapsed: false,
+            zenMode: false,
             searchIndex: -1,
             bulkMode: false,
             selectedIds: new Set(),
@@ -1201,7 +1110,6 @@
                 { name: 'The Verge', baseUrl: 'https://www.theverge.com/search?q=' }
             ];
             
-            // Standard Topics
             const topics = [
                 { title: "NVIDIA Announces New Blackwell Chip Efficiency", tag: "ai", impact: "high", score: 9.2 },
                 { title: "Global Energy Grid Strain due to AI Data Centers", tag: "energy", impact: "high", score: 8.8 },
@@ -1241,7 +1149,7 @@
                 };
             });
         };
-        
+
         // Mock Widget Data
         function generateStartupData() {
             return [
@@ -1548,6 +1456,7 @@
              renderHighlightKeywords();
         }
 
+        // Widgets Renderers
         function renderStartupRadar() {
             const container = document.getElementById('startupRadarWidget');
             const data = generateStartupData();
@@ -1582,6 +1491,54 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Zen Mode
+        function toggleZenMode() {
+            appState.zenMode = !appState.zenMode;
+            document.body.classList.toggle('zen-mode');
+        }
+
+        // Knowledge Graph
+        function renderKnowledgeGraph() {
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            const nodes = [];
+            for(let i=0; i<20; i++) {
+                nodes.push({x: Math.random()*width, y: Math.random()*height, r: 2 + Math.random()*4});
+            }
+            
+            ctx.clearRect(0,0,width,height);
+            ctx.fillStyle = '#00ff9d';
+            ctx.strokeStyle = 'rgba(0, 255, 157, 0.2)';
+            
+            nodes.forEach(n => {
+                ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2); ctx.fill();
+                nodes.forEach(n2 => {
+                    const dist = Math.hypot(n.x-n2.x, n.y-n2.y);
+                    if(dist < 100) {
+                        ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(n2.x, n2.y); ctx.stroke();
+                    }
+                });
+            });
+        }
+        
+        // CSV Export
+        function exportCSV() {
+            const saved = appState.articles.filter(a => appState.savedArticles.includes(a.id));
+            if(saved.length === 0) return alert("No saved articles to export.");
+            
+            let csv = "Title,Source,Date,Tag,Summary\n";
+            saved.forEach(a => {
+                csv += `"${a.title}","${a.source}","${a.time}","${a.tag}","${a.summary}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Nexus_Export_${Date.now()}.csv`; a.click();
         }
 
         // Custom Tooltip Logic
@@ -2148,8 +2105,6 @@
             if(tag === 'energy') return 'zap';
             if(tag === 'policy') return 'scale';
             if(tag === 'realestate') return 'building';
-            if(tag === 'startups') return 'rocket';
-            if(tag === 'infrastructure') return 'server';
             return 'tag';
         }
 
@@ -2525,7 +2480,7 @@
         document.getElementById('downloadBriefBtn').addEventListener('click', () => {
             const saved = appState.articles.filter(a => appState.savedArticles.includes(a.id));
             if(saved.length === 0) return;
-            let content = `NEXUS INTEL BRIEF\nGenerated: ${new Date().toLocaleString()}\n\n`;
+            let content = `NEXUS INTELLIGENCE BRIEF\nGenerated: ${new Date().toLocaleString()}\n\n`;
             saved.forEach((a, i) => { content += `${i+1}. ${a.title}\nSource: ${a.source} | ${a.time}\nSummary: ${a.summary}\nLink: ${a.url}\n\n`; });
             const blob = new Blob([content], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);

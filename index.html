@@ -47,6 +47,8 @@
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             
             --scanline-color: rgba(0, 255, 157, 0.03);
+            
+            --header-height: 70px; /* Defined for sticky calculations */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -79,11 +81,12 @@
             border-bottom: 1px solid var(--color-border);
             overflow: hidden;
             position: relative;
-            height: 40px;
+            height: 36px; /* Slightly smaller */
             display: flex;
             align-items: center;
             font-family: 'JetBrains Mono', monospace;
             contain: layout size;
+            z-index: 102; /* Above header */
         }
         .ticker-wrap { width: 100%; overflow: hidden; position: relative; }
         .ticker { 
@@ -271,35 +274,55 @@
         /* ===== LAYOUT ===== */
         .app-container {
             display: grid;
+            /* Defined columns for desktop */
             grid-template-columns: 300px 1fr 360px;
-            grid-template-rows: auto auto auto 1fr auto;
+            /* Header (fixed), Filters (fixed/sticky), Content (scroll) */
+            grid-template-rows: auto auto 1fr auto; 
             min-height: 100vh;
         }
 
         .app-header {
             grid-column: 1 / -1;
-            background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--color-border); padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.95); /* Slightly more opaque */
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border); 
+            padding: 0 2rem;
+            height: var(--header-height);
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
         }
         .logo-container { display: flex; align-items: center; gap: 12px; }
         .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--color-electric-green), var(--color-data-blue)); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0,255,157,0.3); }
+        
+        /* New Center Intel Section */
+        .header-intel { display: flex; gap: 20px; align-items: center; }
+        .header-intel-item { display: flex; flex-direction: column; align-items: flex-start; }
+        .intel-label { font-size: 0.65rem; color: var(--color-text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .intel-value { font-size: 1rem; font-weight: 700; color: #fff; font-family: 'JetBrains Mono'; line-height: 1.1; }
+        .intel-sub { font-size: 0.7rem; color: var(--color-electric-green); font-weight: 400; margin-left: 5px; }
+
         .header-actions { display: flex; gap: 10px; align-items: center; }
         .action-btn { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
         .action-btn:hover, .action-btn.active { background: var(--color-electric-green); color: var(--color-bg-dark); border-color: var(--color-electric-green); box-shadow: 0 0 15px rgba(0,255,157,0.2); }
         
-        .intelligence-aggregator { grid-column: 1 / -1; background: #0e0e15; padding: 1.5rem 2rem; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
-        
-        /* Filter Container */
-        .filter-container { grid-column: 1 / -1; padding: 1rem 2rem; display: flex; gap: 10px; flex-wrap: wrap; background: var(--color-bg-dark); border-bottom: 1px solid var(--color-border); }
+        /* Filter Container - Sticky below header */
+        .filter-container { 
+            grid-column: 1 / -1; 
+            padding: 1rem 2rem; 
+            display: flex; gap: 10px; flex-wrap: wrap; 
+            background: rgba(10,10,15,0.9); /* Slightly transparent */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky; top: var(--header-height); /* Stick right below header */
+            z-index: 90;
+        }
         .filter-chip { padding: 0.6rem 1.4rem; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); letter-spacing: 0.5px; }
         .filter-chip:hover { border-color: var(--color-text-primary); color: var(--color-text-primary); transform: translateY(-2px); }
         .filter-chip.active { background: var(--color-text-primary); color: var(--color-bg-dark); border-color: var(--color-text-primary); box-shadow: 0 4px 12px rgba(255,255,255,0.2); }
         .filter-chip.active i { color: var(--color-bg-dark); }
         .filter-chip-count { font-size: 0.7rem; opacity: 0.7; margin-left: 4px; }
 
-        .left-sidebar, .right-sidebar { background: var(--color-bg-sidebar); padding: 2rem; overflow-y: auto; height: calc(100vh - 180px); position: sticky; top: 180px; contain: content; }
+        .left-sidebar, .right-sidebar { background: var(--color-bg-sidebar); padding: 2rem; overflow-y: auto; height: calc(100vh - 120px); position: sticky; top: 120px; contain: content; }
         .left-sidebar { border-right: 1px solid var(--color-border); }
         .right-sidebar { border-left: 1px solid var(--color-border); }
         .sidebar-section { margin-bottom: 2.5rem; }
@@ -939,6 +962,25 @@
                     <div style="font-size: 0.65rem; color: var(--color-text-muted); letter-spacing: 1.5px; font-weight: 600;">AI × DATA × ENERGY × POLICY</div>
                 </div>
             </div>
+
+            <!-- Merged Intelligence Aggregator -->
+            <div class="header-intel">
+                 <div class="header-intel-item">
+                     <div class="intel-label">GLOBAL THREAT LEVEL</div>
+                     <div class="intel-value">MODERATE <span class="intel-sub">STABLE</span></div>
+                 </div>
+                 <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.1); margin: 0 10px;"></div>
+                 <div class="header-intel-item">
+                     <div class="intel-label">CONFIDENCE</div>
+                     <div style="display:flex; align-items:center; gap:8px;">
+                         <div class="intel-value">94%</div>
+                         <div style="width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
+                             <div style="width: 94%; height: 100%; background: var(--color-data-blue); border-radius: 2px;"></div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
             <div class="header-actions">
                 <button class="action-btn mobile-widgets-btn" id="mobileWidgetsToggle" title="Toggle Widgets"><i data-lucide="bar-chart-2"></i></button>
                 <button class="action-btn" id="tldrToggleBtn" title="TL;DR Mode" aria-label="TLDR Mode"><i data-lucide="list"></i></button>
@@ -949,16 +991,7 @@
             </div>
         </header>
 
-        <div class="intelligence-aggregator">
-            <div style="flex:1">
-                <div style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Global Threat Level</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: #fff;">MODERATE <span style="font-size: 0.8rem; color: var(--color-electric-green); font-weight: 400;">STABLE</span></div>
-            </div>
-            <div style="width: 200px; display:flex; flex-direction:column; gap:5px;">
-                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--color-text-muted);"><span>CONFIDENCE</span><span>94%</span></div>
-                <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px;"><div style="width:94%; height:100%; background:var(--color-data-blue); border-radius:3px;"></div></div>
-            </div>
-        </div>
+        <!-- No separate intelligence-aggregator div anymore -->
 
         <div class="filter-container">
             <div class="filter-chip active" data-filter="all"><i data-lucide="layers" size="14"></i> ALL NEXUS <span class="filter-chip-count"></span><span id="badge-all" class="chip-badge"></span></div>

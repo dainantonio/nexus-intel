@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | AI × Data × Energy × Policy</title>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://unpkg.com">
+    <title>NEXUS INTEL | Global Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
@@ -15,42 +13,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="scanlines" style="display: none;"></div>
-    <div class="crt-flicker" style="display: none;"></div>
-    <div class="glow-overlay" style="display: none;"></div>
-    <div id="cyberTooltip" class="cyber-tooltip"></div>
+    <div class="scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="glow-overlay"></div>
 
     <div id="notificationArea" class="notification">
-        <i data-lucide="check-circle" style="color: var(--color-electric-green)"></i>
+        <i data-lucide="check-circle"></i>
         <span id="notificationText">System Ready</span>
     </div>
 
-    <div class="modal-overlay" id="searchModal">
-        <div class="modal-content">
-            <div class="search-container">
-                <div class="search-header">
-                    <i data-lucide="search" style="color: var(--color-electric-green);"></i>
-                    <input type="text" class="search-input" id="searchInput" placeholder="Search global intelligence..." autocomplete="off">
-                    <button class="action-btn" id="closeSearchBtn"><i data-lucide="x"></i></button>
-                </div>
-                <div class="search-results" id="searchResults"></div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="graphModal">
-        <div class="modal-content" style="max-width:900px; height:650px;">
+        <div class="modal-content" style="max-width:900px; height:600px;">
             <div class="settings-container">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                    <h2><i data-lucide="network" style="color: var(--color-electric-green); margin-right: 10px;"></i> Knowledge Graph</h2>
+                    <h2 style="color: var(--color-electric-green); font-family: 'JetBrains Mono';">KNOWLEDGE_GRAPH.exe</h2>
                     <button class="action-btn" onclick="document.getElementById('graphModal').classList.remove('active')"><i data-lucide="x"></i></button>
                 </div>
-                <div style="background: #050507; border-radius: 8px; border: 1px solid var(--color-border); overflow: hidden;">
-                    <canvas id="graphCanvas"></canvas>
-                </div>
-                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 15px; font-family: 'JetBrains Mono';">
-                    NODE CLUSTERS REPRESENT REAL-TIME INTELLIGENCE SIGNALS. DISTANCE INDICATES DATA CORRELATION.
-                </p>
+                <canvas id="graphCanvas" style="background: #050507; border: 1px solid var(--color-border); border-radius: 8px;"></canvas>
             </div>
         </div>
     </div>
@@ -59,31 +38,28 @@
         <header class="app-header">
             <div class="logo-container">
                 <div class="logo-icon"><i data-lucide="aperture" style="color: #0a0a0f;"></i></div>
-                <div>
-                    <h1 style="font-size: 1.2rem; font-weight: 800;">NEXUS INTEL</h1>
-                </div>
+                <h1 style="font-size: 1.2rem; font-weight: 800;">NEXUS INTEL</h1>
             </div>
-
             <div class="header-actions">
-                <div id="systemClock" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--color-electric-green);">00:00:00 UTC</div>
+                <div id="systemClock" style="font-family: 'JetBrains Mono'; color: var(--color-electric-green); margin-right: 15px;">00:00:00 UTC</div>
                 <button class="action-btn" id="zenModeToggle" title="Zen Mode (Z)"><i data-lucide="maximize-2"></i></button>
                 <button class="action-btn" id="graphModeToggle" title="Knowledge Graph (G)"><i data-lucide="network"></i></button>
                 <button class="action-btn" id="refreshBtn"><i data-lucide="refresh-cw"></i></button>
-                <button class="action-btn" id="triggerSettingsBtn"><i data-lucide="settings"></i></button>
             </div>
         </header>
 
         <div class="filter-container">
-            <div class="filter-chip active" data-filter="all"><i data-lucide="layers"></i> ALL <span class="filter-chip-count"></span></div>
+            <div class="filter-chip active" data-filter="all"><i data-lucide="layers"></i> ALL NODES</div>
             <div class="filter-chip" data-filter="ai"><i data-lucide="cpu"></i> AI</div>
             <div class="filter-chip" data-filter="energy"><i data-lucide="zap"></i> ENERGY</div>
             <div class="filter-chip" data-filter="policy"><i data-lucide="scale"></i> POLICY</div>
+            <div class="filter-chip" data-filter="infrastructure"><i data-lucide="server"></i> INFRA</div>
         </div>
 
         <aside class="left-sidebar">
             <div class="sidebar-section">
-                <h3><i data-lucide="map"></i> GEOSPATIAL</h3>
-                <div id="miniMap"></div>
+                <h3><i data-lucide="map"></i> GEOSPATIAL_INTEL</h3>
+                <div id="miniMap" style="height: 300px; border-radius: 12px;"></div>
             </div>
         </aside>
 
@@ -93,7 +69,7 @@
 
         <aside class="right-sidebar">
             <div class="sidebar-section">
-                <h3><i data-lucide="activity"></i> SYSTEM HEALTH</h3>
+                <h3><i data-lucide="activity"></i> IMPACT_DISTRIBUTION</h3>
                 <div id="impactChart"></div>
             </div>
         </aside>

@@ -80,45 +80,45 @@ let curatedNews = [
         title: "OpenAI 'Operator' enters widespread beta.",
         summary: "The autonomous agent, capable of performing complex multi-step workflows across browsers, is now available to Enterprise tier users. Initial reports show 40% efficiency gains in procurement.",
         implication: "Agentic workflows moving from theory to production; SaaS pricing models under threat.",
-        sentiment: "pos",
+        sentiment: "pos", 
         impact: 90,
         url: "https://techcrunch.com/2026/01/22/openai-operator-beta-launch/"
     },
     {
         id: 6,
         source: "Financial Times",
-        category: "Policy",
-        time: "4h ago",
-        title: "US Expands Export Controls to Bio-AI",
-        summary: "New commerce department rules restrict export of foundation models fine-tuned on biological sequence data to specific nations.",
-        implication: "Generative Biology sector faces new geopolitical friction.",
-        sentiment: "neg",
+        category: "Policy", 
+        time: "4h ago", 
+        title: "US Expands Export Controls to Bio-AI", 
+        summary: "New commerce department rules restrict export of foundation models fine-tuned on biological sequence data to specific nations.", 
+        implication: "Generative Biology sector faces new geopolitical friction.", 
+        sentiment: "neg", 
         impact: 85,
-        url: "https://www.ft.com/content/us-export-controls-bio-ai"
+        url: "https://www.ft.com/content/us-export-controls-bio-ai" 
     },
     {
         id: 7,
-        source: "VentureBeat",
-        category: "Data Center",
-        time: "5h ago",
-        title: "Liquid Cooling startup 'CoolChip' raises $200M.",
-        summary: "As rack densities hit 150kW, traditional air cooling is obsolete. CoolChip's direct-to-chip solution claims 30% energy reduction.",
-        implication: "Physical infrastructure adaptation is the next big VC thesis.",
-        sentiment: "pos",
+        source: "VentureBeat", 
+        category: "Data Center", 
+        time: "5h ago", 
+        title: "Liquid Cooling startup 'CoolChip' raises $200M.", 
+        summary: "As rack densities hit 150kW, traditional air cooling is obsolete. CoolChip's direct-to-chip solution claims 30% energy reduction.", 
+        implication: "Physical infrastructure adaptation is the next big VC thesis.", 
+        sentiment: "pos", 
         impact: 75,
-        url: "https://venturebeat.com/ai/coolchip-raises-200m-series-b/"
+        url: "https://venturebeat.com/ai/coolchip-raises-200m-series-b/" 
     },
     {
         id: 8,
-        source: "The Verge",
-        category: "AI",
-        time: "6h ago",
-        title: "Anthropic publishes 'Constitution 2.0'",
-        summary: "Updated safety guidelines for Claude 4 focus on 'power-seeking' behaviors and deceptive alignment detection.",
-        implication: "Safety vs Capability debate shifting towards specific behavioral guarantees.",
-        sentiment: "neu",
+        source: "The Verge", 
+        category: "AI", 
+        time: "6h ago", 
+        title: "Anthropic publishes 'Constitution 2.0'", 
+        summary: "Updated safety guidelines for Claude 4 focus on 'power-seeking' behaviors and deceptive alignment detection.", 
+        implication: "Safety vs Capability debate shifting towards specific behavioral guarantees.", 
+        sentiment: "neu", 
         impact: 80,
-        url: "https://www.theverge.com/2026/02/01/anthropic-constitution-2-0"
+        url: "https://www.theverge.com/2026/02/01/anthropic-constitution-2-0" 
     }
 ];
 
@@ -199,7 +199,6 @@ function scanNewsForTickers(articles) {
 
 function renderMarketWatch() {
     const container = document.getElementById('marketWatchList');
-    // Sort slightly so "flashier" stocks don't jump around too much, or keep append order
     
     container.innerHTML = marketData.map(item => {
         const isPositive = item.change >= 0;
@@ -234,7 +233,6 @@ async function updateMarketData() {
     
     if (apiKey) {
         // If user has key, try to fetch for all symbols
-        // Limiting to first 3 to avoid hitting free tier rate limits too hard
         const symbolsToFetch = marketData.slice(0, 3).map(m => m.symbol);
         
         for (let sym of symbolsToFetch) {
@@ -251,7 +249,7 @@ async function updateMarketData() {
         }
         renderMarketWatch();
     } else {
-        // SIMULATION LOGIC (Brownian Motion) for ALL stocks
+        // SIMULATION LOGIC
         marketData.forEach(item => {
             item.prevPrice = item.price;
             const volatility = 0.003; // Slight volatility
@@ -271,8 +269,8 @@ async function loadNewsFeed() {
     } else {
        renderFeed(curatedNews);
        updateBrief(curatedNews);
-       scanNewsForTickers(curatedNews); // <--- Trigger Scan
-       renderMarketWatch(); // Ensure they appear
+       scanNewsForTickers(curatedNews); 
+       renderMarketWatch();
     }
 }
 
@@ -291,14 +289,14 @@ async function fetchRealNews(apiKey) {
                 summary: art.description || "No summary available.",
                 implication: "Live intel ingest. Auto-analysis pending...", 
                 sentiment: Math.random() > 0.5 ? 'pos' : 'neu', 
-                url: art.url,
+                url: art.url, // Ensuring URL is passed correctly
                 impact: Math.floor(Math.random() * 30) + 70 
             }));
             
             curatedNews = realArticles; 
             renderFeed(curatedNews);
             updateBrief(curatedNews);
-            scanNewsForTickers(curatedNews); // <--- Trigger Scan
+            scanNewsForTickers(curatedNews);
         } else {
             console.warn("NewsAPI Error:", data.message);
             renderFeed(curatedNews); 
@@ -487,12 +485,27 @@ function toggleAutoRefresh() {
 
 // --- THEME & UTILS ---
 function toggleCyberpunk() {
+    // Ensure Light Mode is off
+    if (document.body.classList.contains('light-mode')) {
+        toggleLightMode();
+    }
+
     document.body.classList.toggle('cyberpunk-mode');
     document.getElementById('cyberpunkToggle').classList.toggle('active');
     const logo = document.querySelector('.logo-text');
     logo.innerHTML = document.body.classList.contains('cyberpunk-mode') 
-        ? "NEXUS_INTEL <span style='font-size:0.8em;opacity:0.5'>v6.6</span>"
-        : "NEXUS INTEL <span style='font-size:0.8em;opacity:0.5'>v6.6</span>";
+        ? "NEXUS_INTEL <span style='font-size:0.8em;opacity:0.5'>v6.7</span>"
+        : "NEXUS INTEL <span style='font-size:0.8em;opacity:0.5'>v6.7</span>";
+}
+
+function toggleLightMode() {
+    // Ensure Cyberpunk is off
+    if (document.body.classList.contains('cyberpunk-mode')) {
+        toggleCyberpunk();
+    }
+
+    document.body.classList.toggle('light-mode');
+    document.getElementById('lightModeToggle').classList.toggle('active');
 }
 
 function toggleZenMode() {
@@ -523,30 +536,23 @@ function saveSettings() {
     localStorage.setItem('nexus_key_newsapi', document.getElementById('key-newsapi').value);
     localStorage.setItem('nexus_key_gnews', document.getElementById('key-gnews').value);
     localStorage.setItem('nexus_key_finnhub', document.getElementById('key-finnhub').value);
+    localStorage.setItem('nexus_key_openai', document.getElementById('key-openai').value);
+    localStorage.setItem('nexus_key_gemini', document.getElementById('key-gemini').value);
     
-    const btn = document.querySelector('.settings-modal .action-btn:last-child');
-    const originalText = btn.innerText;
-    btn.innerText = "Configuration Saved";
-    btn.style.background = "var(--accent-green)";
-    btn.style.color = "#000";
-    
+    // Refresh Data
     loadNewsFeed();
     updateMarketData();
     
-    setTimeout(() => {
-        toggleSettings();
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.style.background = "transparent";
-            btn.style.color = "var(--accent-green)";
-        }, 500);
-    }, 800);
+    // Close Modal immediately
+    toggleSettings();
 }
 
 function loadSettings() {
     if(localStorage.getItem('nexus_key_newsapi')) document.getElementById('key-newsapi').value = localStorage.getItem('nexus_key_newsapi');
     if(localStorage.getItem('nexus_key_gnews')) document.getElementById('key-gnews').value = localStorage.getItem('nexus_key_gnews');
     if(localStorage.getItem('nexus_key_finnhub')) document.getElementById('key-finnhub').value = localStorage.getItem('nexus_key_finnhub');
+    if(localStorage.getItem('nexus_key_openai')) document.getElementById('key-openai').value = localStorage.getItem('nexus_key_openai');
+    if(localStorage.getItem('nexus_key_gemini')) document.getElementById('key-gemini').value = localStorage.getItem('nexus_key_gemini');
 }
 
 // --- VIEW LOGIC ---

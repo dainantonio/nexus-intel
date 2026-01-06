@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | V6.6</title>
+    <title>NEXUS INTEL | V6.7</title>
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,7 +22,7 @@
     <header class="app-header">
         <div class="logo-area">
             <div class="logo-icon"><i data-lucide="aperture"></i></div>
-            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v6.6</span></div>
+            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v6.7</span></div>
         </div>
 
         <div class="search-container">
@@ -30,7 +30,9 @@
             <input type="text" class="search-input" id="globalSearch" placeholder="Command + K to search..." onkeyup="handleSearch(this.value)">
         </div>
 
-        <div style="display: flex; gap: 4px;">
+        <div style="display: flex; gap: 4px; align-items: center;">
+            <div style="font-family:var(--font-mono); font-size:0.75rem; margin-right: 12px;" id="clock">00:00 UTC</div>
+
             <button class="action-btn refresh-btn" id="refreshBtn" title="Continuous Refresh (30s)" onclick="toggleAutoRefresh()">
                 <i data-lucide="rotate-cw"></i>
             </button>
@@ -115,8 +117,7 @@
                     <button class="nav-tab" onclick="switchView('graph')">Nexus Graph</button>
                     <button class="nav-tab" onclick="switchView('heatmap')">Heat Map</button>
                 </div>
-                <div style="font-family:var(--font-mono); font-size:0.75rem;" id="clock">00:00 UTC</div>
-            </div>
+                </div>
 
             <div class="feed-controls">
                 <span class="filter-chip active" onclick="filterFeed('All', this)">All Sources</span>
@@ -199,6 +200,10 @@
                         <div class="toggle-switch" id="cyberpunkToggle" onclick="toggleCyberpunk()"></div>
                     </div>
                     <div class="setting-row">
+                        <span style="font-size:0.9rem;">Light Mode</span>
+                        <div class="toggle-switch" id="lightModeToggle" onclick="toggleLightMode()"></div>
+                    </div>
+                    <div class="setting-row">
                         <span style="font-size:0.9rem;">Sentiment Heatmap</span>
                         <div class="toggle-switch" id="sentimentToggle" onclick="toggleSentimentOverlay()"></div>
                     </div>
@@ -208,15 +213,27 @@
                     <div class="settings-section-title"><i data-lucide="rss"></i> Data Streams</div>
                     <div class="api-input-group">
                         <label class="api-input-label">NewsAPI Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter key..." id="key-newsapi"></div>
+                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter NewsAPI key..." id="key-newsapi"></div>
+                    </div>
+                    <div class="api-input-group">
+                        <label class="api-input-label">GNews API Key</label>
+                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter GNews key..." id="key-gnews"></div>
                     </div>
                     <div class="api-input-group">
                         <label class="api-input-label">Finnhub API Key (Stock Ticker)</label>
                         <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter Finnhub key..." id="key-finnhub"></div>
                     </div>
+                    <div class="api-input-group">
+                        <label class="api-input-label">OpenAI API Key</label>
+                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="sk-..." id="key-openai"></div>
+                    </div>
+                    <div class="api-input-group">
+                        <label class="api-input-label">Gemini API Key</label>
+                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter Gemini key..." id="key-gemini"></div>
+                    </div>
                 </div>
 
-                <button class="action-btn" style="width:100%; border-color:var(--accent-green); color:var(--accent-green); font-weight:600; height:40px;" onclick="saveSettings()">Save Configuration</button>
+                <button class="action-btn" style="width:100%; border-color:var(--accent-green); color:var(--accent-green); font-weight:600; height:40px;" onclick="saveSettings()">Save & Close</button>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | V6.8</title>
+    <title>NEXUS INTEL | V7.0 LIVE</title>
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,7 +22,7 @@
     <header class="app-header">
         <div class="logo-area">
             <div class="logo-icon"><i data-lucide="aperture"></i></div>
-            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v6.8</span></div>
+            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v7.0</span></div>
         </div>
 
         <div class="search-container">
@@ -40,7 +40,10 @@
                 <i data-lucide="eye"></i>
             </button>
             <button class="action-btn" title="Settings" onclick="toggleSettings()"><i data-lucide="sliders-horizontal"></i></button>
-            <button class="action-btn" title="Alerts" onclick="toggleAlerts()"><i data-lucide="bell"></i></button>
+            <button class="action-btn" title="Alerts" onclick="toggleAlerts()">
+                <div class="alert-dot" id="alertDot" style="display:none;"></div>
+                <i data-lucide="bell"></i>
+            </button>
         </div>
     </header>
 
@@ -215,25 +218,25 @@
 
                 <div class="settings-section">
                     <div class="settings-section-title"><i data-lucide="rss"></i> Data Streams</div>
+                    
                     <div class="api-input-group">
-                        <label class="api-input-label">NewsAPI Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter NewsAPI key..." id="key-newsapi"></div>
+                        <label class="api-input-label">The Guardian API Key (Recommended)</label>
+                        <div class="api-input-wrapper">
+                            <input type="password" class="api-input" placeholder="Enter Guardian key..." id="key-guardian">
+                        </div>
                     </div>
+                    
                     <div class="api-input-group">
                         <label class="api-input-label">GNews API Key</label>
                         <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter GNews key..." id="key-gnews"></div>
                     </div>
                     <div class="api-input-group">
+                        <label class="api-input-label">NewsAPI Key (Often blocks browsers)</label>
+                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter NewsAPI key..." id="key-newsapi"></div>
+                    </div>
+                    <div class="api-input-group">
                         <label class="api-input-label">Finnhub API Key (Stock Ticker)</label>
                         <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter Finnhub key..." id="key-finnhub"></div>
-                    </div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">OpenAI API Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="sk-..." id="key-openai"></div>
-                    </div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">Gemini API Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter Gemini key..." id="key-gemini"></div>
                     </div>
                 </div>
 
@@ -251,31 +254,8 @@
                 <button class="action-btn" onclick="toggleAlerts()"><i data-lucide="x"></i></button>
             </div>
             
-            <div class="modal-body">
-                <div class="alert-item">
-                    <i data-lucide="alert-triangle" class="alert-icon"></i>
-                    <div class="alert-content">
-                        <h4>Volatility Spike Detected</h4>
-                        <p>Market sentiment volatility index crossed 85. High probability of rapid price action in compute futures.</p>
-                        <div class="alert-time">2 mins ago</div>
-                    </div>
-                </div>
-                <div class="alert-item">
-                    <i data-lucide="server" class="alert-icon" style="color:var(--accent-orange)"></i>
-                    <div class="alert-content">
-                        <h4>API Latency Warning</h4>
-                        <p>GNews data stream experiencing 400ms delay. Switching to redundant nodes.</p>
-                        <div class="alert-time">15 mins ago</div>
-                    </div>
-                </div>
-                 <div class="alert-item">
-                    <i data-lucide="shield-alert" class="alert-icon" style="color:var(--accent-blue)"></i>
-                    <div class="alert-content">
-                        <h4>New Policy Document</h4>
-                        <p>Nexus Crawler indexed "EU AI Act - Annex II" updates. Analysis pending.</p>
-                        <div class="alert-time">1 hour ago</div>
-                    </div>
-                </div>
+            <div class="modal-body" id="alertsList">
+                <div style="padding:20px; text-align:center; color:var(--text-muted);">No active alerts</div>
             </div>
         </div>
     </div>

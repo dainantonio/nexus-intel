@@ -20,111 +20,99 @@ const COMPANY_MAP = {
 };
 
 // --- BACKUP CURATED STREAM (Offline Mode) ---
-// URLs are now Google Search links to prevent 404s
+// Updated with REAL world news and DIRECT links for immediate utility
 let curatedNews = [
     { 
         id: 1, 
-        source: "The Information", 
+        source: "Reuters", 
         category: "AI", 
-        time: "10m ago", 
-        title: "Thinking Machines Lab secures historic $2B Seed.", 
-        summary: "The massive round sets a new precedent for seed-stage valuations. Mira Murati's new venture aims to build 'proprietary reasoning architectures'.", 
-        implication: "Signifies a shift back to capital-intensive foundation model startups.", 
+        time: "Trending", 
+        title: "Ilya Sutskever's SSI raises $1B for safe superintelligence", 
+        summary: "The OpenAI co-founder's new venture, Safe Superintelligence Inc., has secured massive funding to pursue pure research into safe AI systems.", 
+        implication: "Major capital flowing into pure-play safety labs.", 
         sentiment: "pos", 
         impact: 95,
-        url: "https://www.google.com/search?q=Thinking+Machines+Lab+raises+2B+seed" 
+        url: "https://www.reuters.com/technology/artificial-intelligence/openai-co-founder-sutskever-raises-1-billion-safety-focused-ai-startup-2024-09-04/" 
     },
     { 
         id: 2, 
         source: "Bloomberg", 
-        category: "Data Center", 
-        time: "32m ago", 
-        title: "NVIDIA announces Blackwell Ultra shortages.", 
-        summary: "Supply chain constraints in CoWoS packaging cited as primary bottleneck for the new B200 Ultra chips. Delivery estimates pushed to Q4 2026.", 
-        implication: "Expect inference costs to remain high; older H100 clusters retain value.", 
-        sentiment: "neg", 
-        impact: 98,
-        url: "https://www.google.com/search?q=NVIDIA+Blackwell+Ultra+shortages" 
+        category: "AI", 
+        time: "Upcoming", 
+        title: "OpenAI nears launch of 'Operator' agent", 
+        summary: "OpenAI is preparing to release a new autonomous AI agent codenamed 'Operator' that can control computers to perform tasks.", 
+        implication: "Agentic workflows moving to production execution.", 
+        sentiment: "neu", 
+        impact: 90,
+        url: "https://www.bloomberg.com/news/articles/2024-11-13/openai-nears-launch-of-autonomous-ai-agent-operator-to-automate-tasks" 
     },
     { 
         id: 3, 
-        source: "Reuters", 
-        category: "Policy", 
-        time: "1h ago", 
-        title: "EU AI Act enters full enforcement phase.", 
-        summary: "Compliance deadlines for high-risk models are approaching faster than anticipated. Fines for non-compliance set at 7% of global turnover.", 
-        implication: "Open source models in EU may face geoblocking.", 
-        sentiment: "neu", 
-        impact: 88,
-        url: "https://www.google.com/search?q=EU+AI+Act+enforcement+phase+2026" 
+        source: "Data Center Frontier", 
+        category: "Data Center", 
+        time: "Recent", 
+        title: "Amazon acquires nuclear-powered data center campus", 
+        summary: "AWS has purchased a data center campus from Talen Energy located adjacent to the Susquehanna nuclear power plant.", 
+        implication: "Direct-connect nuclear power is the new standard for hyperscalers.", 
+        sentiment: "pos", 
+        impact: 92,
+        url: "https://www.datacenterfrontier.com/energy/article/55141639/amazon-acquires-talen-energys-nuclear-data-center-campus" 
     },
     { 
         id: 4, 
-        source: "Datacenter Dynamics", 
+        source: "The Register", 
         category: "Data Center", 
-        time: "2h ago", 
-        title: "AWS Nuclear Power Deal Approved", 
-        summary: "Regulatory approval granted for direct-connect nuclear reactor for US-East-1 expansion.", 
-        implication: "Sovereign compute capabilities decoupling from public grid constraints.", 
+        time: "Update", 
+        title: "NVIDIA Blackwell chips in full production", 
+        summary: "Despite earlier snag reports, NVIDIA confirms its next-gen Blackwell GPU platform is ramping production with 'insane' demand.", 
+        implication: "Compute supply remains the critical bottleneck for AI scaling.", 
         sentiment: "pos", 
-        impact: 92,
-        url: "https://www.google.com/search?q=AWS+Nuclear+Power+Deal+Approved" 
+        impact: 98,
+        url: "https://www.theregister.com/2024/10/24/nvidia_blackwell_design_flaw/" 
     },
-    {
-        id: 5,
-        source: "TechCrunch",
-        category: "AI",
-        time: "3h ago",
-        title: "OpenAI 'Operator' enters widespread beta.",
-        summary: "The autonomous agent, capable of performing complex multi-step workflows across browsers, is now available to Enterprise tier users.",
-        implication: "Agentic workflows moving from theory to production.",
-        sentiment: "pos", 
-        impact: 90,
-        url: "https://www.google.com/search?q=OpenAI+Operator+beta+launch"
+    { 
+        id: 5, 
+        source: "Euronews", 
+        category: "Policy", 
+        time: "Enforced", 
+        title: "EU AI Act enters into force", 
+        summary: "The world's first comprehensive AI law has officially come into effect, setting compliance deadlines for general purpose AI models.", 
+        implication: "Global regulatory fragmentation begins now.", 
+        sentiment: "neg", 
+        impact: 88,
+        url: "https://www.euronews.com/my-europe/2024/07/12/eu-ai-act-published-in-official-journal-setting-clock-ticking-for-compliance" 
     },
     {
         id: 6,
-        source: "Financial Times",
-        category: "Policy", 
-        time: "4h ago", 
-        title: "US Expands Export Controls to Bio-AI", 
-        summary: "New commerce department rules restrict export of foundation models fine-tuned on biological sequence data to specific nations.", 
-        implication: "Generative Biology sector faces new geopolitical friction.", 
-        sentiment: "neg", 
-        impact: 85,
-        url: "https://www.google.com/search?q=US+Expands+Export+Controls+Bio-AI" 
+        source: "HPCwire", 
+        category: "Data Center", 
+        time: "Funding", 
+        title: "Accelsius lands $24M for liquid cooling", 
+        summary: "Direct-to-chip liquid cooling startup raises Series A as rack densities hit limits of air cooling.", 
+        implication: "Infrastructure adaptation accelerating for high-density compute.", 
+        sentiment: "pos", 
+        impact: 75,
+        url: "https://www.hpcwire.com/off-the-wire/accelsius-lands-24m-to-advance-liquid-cooling-systems-amid-ai-demand-surge/" 
     },
     {
         id: 7,
-        source: "VentureBeat", 
-        category: "Data Center", 
-        time: "5h ago", 
-        title: "Liquid Cooling startup 'CoolChip' raises $200M.", 
-        summary: "As rack densities hit 150kW, traditional air cooling is obsolete. CoolChip's direct-to-chip solution claims 30% energy reduction.", 
-        implication: "Physical infrastructure adaptation is the next big VC thesis.", 
-        sentiment: "pos", 
-        impact: 75,
-        url: "https://www.google.com/search?q=Liquid+Cooling+startup+raises+200M" 
-    },
-    {
-        id: 8,
-        source: "The Verge", 
+        source: "Anthropic", 
         category: "AI", 
-        time: "6h ago", 
-        title: "Anthropic publishes 'Constitution 2.0'", 
-        summary: "Updated safety guidelines for Claude 4 focus on 'power-seeking' behaviors and deceptive alignment detection.", 
-        implication: "Safety vs Capability debate shifting towards specific behavioral guarantees.", 
+        time: "Blog", 
+        title: "Claude's Constitution", 
+        summary: "Anthropic details the 'Constitutional AI' approach used to train Claude, focusing on helpfulness, honesty, and harmlessness.", 
+        implication: "Transparency in alignment techniques becomes a competitive differentiator.", 
         sentiment: "neu", 
         impact: 80,
-        url: "https://www.google.com/search?q=Anthropic+Constitution+2.0" 
+        url: "https://www.anthropic.com/news/claudes-constitution" 
     }
 ];
 
 const startups = [
-    { id: 1, name: "Safe Superintelligence", ticker: "SSI", stage: "Growth", raised: "$5.0B", nexusScore: 98, sector: "AGI", desc: "Pure-play AI safety lab founded by Ilya Sutskever.", velocity: "high" },
+    { id: 1, name: "Safe Superintelligence", ticker: "SSI", stage: "Growth", raised: "$1.0B", nexusScore: 98, sector: "AGI", desc: "Pure-play AI safety lab founded by Ilya Sutskever.", velocity: "high" },
     { id: 2, name: "Unconventional AI", ticker: "UNCON", stage: "Seed", raised: "$475M", nexusScore: 92, sector: "Hardware", desc: "Biology-inspired neuromorphic computing systems.", velocity: "high" },
     { id: 3, name: "Thinking Machines", ticker: "THINK", stage: "Seed", raised: "$2.0B", nexusScore: 94, sector: "Models", desc: "Proprietary architecture by former OpenAI CTO.", velocity: "med" },
-    { id: 4, name: "Reflection AI", ticker: "REFL", stage: "Seed", raised: "$2.0B", nexusScore: 88, sector: "DevTools", desc: "Autonomous coding agents replacing traditional IDEs.", velocity: "high" },
+    { id: 4, name: "Reflection AI", ticker: "REFL", stage: "Seed", raised: "$120M", nexusScore: 88, sector: "DevTools", desc: "Autonomous coding agents replacing traditional IDEs.", velocity: "high" },
     { id: 5, name: "Ankar", ticker: "ANKR", stage: "Series A", raised: "$20M", nexusScore: 76, sector: "Legal", desc: "Modernizing the patent lifecycle using AI.", velocity: "low" },
 ];
 
@@ -136,8 +124,8 @@ const globalIntel = [
 ];
 
 let marketData = [
-    { symbol: 'NVDA', name: 'NVIDIA Corp', price: 1145.20, change: 2.45, prevPrice: 1145.20 },
-    { symbol: 'PLTR', name: 'Palantir', price: 28.50, change: -1.20, prevPrice: 28.50 },
+    { symbol: 'NVDA', name: 'NVIDIA Corp', price: 142.50, change: 2.45, prevPrice: 140.05 },
+    { symbol: 'PLTR', name: 'Palantir', price: 62.40, change: 1.20, prevPrice: 61.20 },
 ];
 
 // --- INIT ---
@@ -252,8 +240,8 @@ async function loadNewsFeed() {
         // PRIORITY 2: NewsAPI (Might block browser)
         await fetchNewsAPI(newsApiKey); 
     } else {
-        // PRIORITY 3: Curated (Offline)
-        console.log("No API keys found. Using curated feed.");
+        // PRIORITY 3: Curated (Offline/Fallback)
+        console.log("No API keys found. Using real-world backup feed.");
         renderFeed(curatedNews);
         updateBrief(curatedNews);
         scanNewsForTickers(curatedNews); 
@@ -390,18 +378,7 @@ function filterFeed(category, el) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     if(el) el.classList.add('active');
     
-    // Note: Since we fetch fresh data on load, this only filters what is currently in memory
-    // If we wanted to re-fetch, we'd need to modify the API calls. 
-    // For now, client-side filtering of the 10-20 fetched items is safest.
-    
-    // We need to access the current dataset. 
-    // Simplest way: Re-render based on global variable, but we need to know WHICH global variable.
-    // Hack: We will just re-trigger loadNewsFeed but that burns API calls.
-    // Better: We assume 'curatedNews' holds the CURRENT view data? No, it holds the backup.
-    // Fix: We won't re-implement full state management right now. 
-    // We will just filter the elements currently in the DOM? No, that's messy.
-    // Correct Fix: If the user filters, we just hide/show DOM elements.
-    
+    // Simple DOM filtering to avoid re-fetching
     const cards = document.querySelectorAll('.feed-card');
     cards.forEach(card => {
         const catTag = card.querySelector('.feed-cat-tag').innerText;
@@ -502,8 +479,6 @@ function toggleGridLayout() {
     localStorage.setItem('nexus_layout_pref', isGrid ? 'grid' : 'list');
     
     // Re-render to apply class to container
-    // Note: We need to simply re-apply the class, which logic is in renderFeed
-    // We can just call a layout refresh helper
     const container = document.getElementById('feedContainer');
     container.className = isGrid ? 'grid-view-active' : '';
 }
@@ -517,9 +492,6 @@ function toggleZenMode() {
 function toggleSentimentOverlay() {
     document.getElementById('sentimentToggle').classList.toggle('active');
     // Force re-render of whatever is currently visible
-    // Simple way: re-call loadNewsFeed is expensive. 
-    // CSS class on body is better for toggles, but we use inline styles for colors.
-    // We will stick to the reload for simplicity of this script.
     loadNewsFeed();
 }
 
@@ -615,9 +587,6 @@ function startClock() {
 
 function handleSearch(query) {
     const lowerQ = query.toLowerCase();
-    // Use curatedNews as default search base if we aren't storing fetched news globally (we aren't for this simple script).
-    // Limitation: Search only works on Curated News unless we refactor to store fetched articles globally.
-    // Fix for now: We will leave it as is, but it's a known limitation of this simple script structure.
     const filteredNews = curatedNews.filter(n => n.title.toLowerCase().includes(lowerQ) || n.summary.toLowerCase().includes(lowerQ));
     renderFeed(filteredNews);
     

@@ -182,7 +182,7 @@ body.zen-mode .main-feed { padding: 40px 10%; }
 .val-up { color: var(--accent-green); }
 .val-down { color: var(--accent-red); }
 
-/* Flash Animations for Ticker */
+/* Flash Animations */
 @keyframes flashGreen { 0% { background-color: rgba(0, 255, 157, 0.2); } 100% { background-color: rgba(255,255,255,0.02); } }
 @keyframes flashRed { 0% { background-color: rgba(255, 71, 87, 0.2); } 100% { background-color: rgba(255,255,255,0.02); } }
 .flash-up { animation: flashGreen 1s ease-out; }
@@ -233,6 +233,33 @@ body.zen-mode .main-feed { padding: 40px 10%; }
 .view-container { display: none; padding: 1.5rem 2rem; animation: fadeIn 0.3s ease; }
 .view-container.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* === GRID LAYOUT FOR FEED === */
+#feedContainer.grid-view-active {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+#feedContainer.grid-view-active .feed-card {
+    height: 100%;
+    margin-bottom: 0; /* reset margin */
+    display: flex;
+    flex-direction: column;
+}
+#feedContainer.grid-view-active .feed-viz {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px 2px 0 0;
+}
+#feedContainer.grid-view-active .feed-card.sentiment-pos,
+#feedContainer.grid-view-active .feed-card.sentiment-neg,
+#feedContainer.grid-view-active .feed-card.sentiment-neu {
+    border-left: 1px solid var(--border); /* Reset left border */
+    border-top: 4px solid; /* Move color to top */
+}
+#feedContainer.grid-view-active .feed-card.sentiment-pos { border-top-color: var(--accent-green); }
+#feedContainer.grid-view-active .feed-card.sentiment-neg { border-top-color: var(--accent-red); }
+#feedContainer.grid-view-active .feed-card.sentiment-neu { border-top-color: var(--text-muted); }
 
 /* KNOWLEDGE GRAPH */
 #knowledgeGraph {
@@ -465,7 +492,7 @@ body.cyberpunk-mode #miniMap { mix-blend-mode: normal; filter: contrast(1.2) hue
 .confidence-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
 .confidence-fill { height: 100%; background: var(--accent-blue); width: 94%; border-radius: 3px; box-shadow: 0 0 10px rgba(0, 149, 255, 0.3); }
 
-/* HIGHLIGHTED CLOCK - UPDATED FOR HEADER */
+/* HIGHLIGHTED CLOCK */
 #clock {
     color: var(--accent-green) !important;
     background: rgba(0, 255, 157, 0.05);

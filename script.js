@@ -6,6 +6,7 @@ const COMPANY_MAP = {
     'google': { symbol: 'GOOGL', name: 'Alphabet Inc' },
     'gemini': { symbol: 'GOOGL', name: 'Alphabet Inc' },
     'meta': { symbol: 'META', name: 'Meta Platforms' },
+    'llama': { symbol: 'META', name: 'Meta Platforms' },
     'apple': { symbol: 'AAPL', name: 'Apple Inc' },
     'amazon': { symbol: 'AMZN', name: 'Amazon.com' },
     'aws': { symbol: 'AMZN', name: 'Amazon AWS' },
@@ -15,19 +16,20 @@ const COMPANY_MAP = {
     'palantir': { symbol: 'PLTR', name: 'Palantir Tech' },
     'oracle': { symbol: 'ORCL', name: 'Oracle Corp' },
     'tesla': { symbol: 'TSLA', name: 'Tesla Inc' },
-    'deepseek': { symbol: 'BABA', name: 'DeepSeek (via Peers)' }
+    'grok': { symbol: 'TSLA', name: 'Tesla (xAI)' },
+    'deepseek': { symbol: 'BABA', name: 'DeepSeek (via Peers)' } // Proxy
 };
 
-// --- BACKUP FEED (SAFE FALLBACK) ---
-// Uses Verified Real URLs to prevent 404s if APIs fail
+// --- BACKUP CURATED STREAM (Offline Mode) ---
+// UPDATED: Uses REAL 2024/2025 URLs to prevent 404 Errors
 let curatedNews = [
     { 
         id: 1, 
         source: "Reuters", 
         category: "AI", 
-        time: "Fallback", 
+        time: "Sep 2024", 
         title: "Ilya Sutskever's SSI raises $1B for safe superintelligence", 
-        summary: "The OpenAI co-founder's new venture, Safe Superintelligence Inc., has secured massive funding to pursue pure research.", 
+        summary: "The OpenAI co-founder's new venture, Safe Superintelligence Inc., has secured massive funding from a16z and Sequoia to pursue pure research.", 
         implication: "Major capital flowing into pure-play safety labs.", 
         sentiment: "pos", 
         impact: 95,
@@ -35,27 +37,75 @@ let curatedNews = [
     },
     { 
         id: 2, 
-        source: "Bloomberg", 
-        category: "Data Center", 
-        time: "Fallback", 
-        title: "Amazon acquires nuclear-powered data center campus", 
-        summary: "AWS has purchased a data center campus from Talen Energy located adjacent to the Susquehanna nuclear power plant.", 
-        implication: "Direct-connect nuclear power is the new standard.", 
-        sentiment: "pos", 
-        impact: 92,
-        url: "https://www.datacenterfrontier.com/energy/article/55141639/amazon-acquires-talen-energys-nuclear-data-center-campus" 
-    },
-    { 
-        id: 3, 
         source: "DeepSeek", 
         category: "AI", 
-        time: "Fallback", 
-        title: "DeepSeek-V3 Released: Open Source MoE", 
-        summary: "New open model claims parity with top closed models at fraction of cost.", 
-        implication: "Open source commoditization accelerating.", 
+        time: "Dec 2024", 
+        title: "DeepSeek-V3 Released: Open Source MoE Model", 
+        summary: "DeepSeek releases V3, a 671B parameter Mixture-of-Experts model claiming performance parity with top closed models at a fraction of the cost.", 
+        implication: "Open source models closing the gap with frontier labs.", 
         sentiment: "pos", 
         impact: 98,
         url: "https://api-docs.deepseek.com/news/news1226" 
+    },
+    { 
+        id: 3, 
+        source: "Investing.com", 
+        category: "Data Center", 
+        time: "Nov 2024", 
+        title: "Amazon backs Talen nuclear deal despite FERC rejection", 
+        summary: "Despite a regulatory setback, Amazon remains committed to its partnership with Talen Energy to power data centers with direct nuclear energy.", 
+        implication: "Regulatory friction increasing for sovereign compute power deals.", 
+        sentiment: "neu", 
+        impact: 92,
+        url: "https://www.investing.com/news/stock-market-news/amazon-backs-talen-nuclear-deal-despite-regulatory-rejection--bloomberg-news-3702150" 
+    },
+    { 
+        id: 4, 
+        source: "TechCrunch", 
+        category: "AI", 
+        time: "Nov 2024", 
+        title: "OpenAI prepares 'Operator' autonomous agent", 
+        summary: "OpenAI is reportedly nearing the launch of 'Operator', a general-purpose agent capable of executing code and browsing the web for users.", 
+        implication: "Agentic workflows moving from theory to production.", 
+        sentiment: "neu", 
+        impact: 90,
+        url: "https://techcrunch.com/2024/11/13/openai-nears-launch-of-autonomous-ai-agent-operator-to-automate-tasks/" 
+    },
+    { 
+        id: 5, 
+        source: "EU Commission", 
+        category: "Policy", 
+        time: "Active", 
+        title: "EU AI Act: Compliance timeline active", 
+        summary: "The AI Act has entered into force. Prohibitions on unacceptable risk AI systems apply 6 months after entry force (Feb 2025).", 
+        implication: "Compliance deadlines for high-risk models approaching.", 
+        sentiment: "neg", 
+        impact: 88,
+        url: "https://artificialintelligenceact.eu/high-level-summary/" 
+    },
+    {
+        id: 6,
+        source: "NVIDIA Blog", 
+        category: "Data Center", 
+        time: "Oct 2024", 
+        title: "NVIDIA Blackwell platform in full production", 
+        summary: "NVIDIA confirms Blackwell (B200) production is ramping up with heavy demand from Microsoft, OpenAI, and Meta.", 
+        implication: "Supply chain bottleneck remains the primary constraint.", 
+        sentiment: "pos", 
+        impact: 98,
+        url: "https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing" 
+    },
+    {
+        id: 7,
+        source: "Anthropic", 
+        category: "AI", 
+        time: "Blog", 
+        title: "Claude's Character and Safety", 
+        summary: "Anthropic publishes details on 'Constitutional AI' and the specific traits trained into the Claude 3.5 model family.", 
+        implication: "Safety techniques becoming a key product differentiator.", 
+        sentiment: "neu", 
+        impact: 80,
+        url: "https://www.anthropic.com/news/claude-3-5-sonnet" 
     }
 ];
 
@@ -85,113 +135,120 @@ let marketData = [
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     initMap();
-    loadSettings(); 
+    loadSettings(); // Loads keys AND layout preference
     loadNewsFeed(); 
     renderStartups(startups);
     renderGlobalIntel();
     startClock();
+    
+    // Initialize ApexCharts
     initImpactChart();
     
-    setInterval(updateMarketData, 5000); 
+    // Start Ticker Loop
+    setInterval(updateMarketData, 2000); 
 });
 
-// --- ALERT SYSTEM ---
-function pushAlert(title, message, type='neutral') {
-    const list = document.getElementById('alertsList');
-    // Clear "No active alerts" if present
-    if(list.innerText.includes("No active alerts")) list.innerHTML = '';
-    
-    const colors = { error: '#ff4757', success: '#00ff9d', neutral: '#0095ff' };
-    const icon = type === 'error' ? 'alert-triangle' : type === 'success' ? 'check-circle' : 'info';
-    
-    const html = `
-    <div class="alert-item" style="animation: fadeIn 0.3s ease;">
-        <i data-lucide="${icon}" class="alert-icon" style="color:${colors[type]}"></i>
-        <div class="alert-content">
-            <h4>${title}</h4>
-            <p>${message}</p>
-            <div class="alert-time">Just now</div>
-        </div>
-    </div>`;
-    
-    list.innerHTML = html + list.innerHTML;
-    lucide.createIcons();
-    
-    // Show dot
-    document.getElementById('alertDot').style.display = 'block';
+// --- MARKET LOGIC ---
+function scanNewsForTickers(articles) {
+    let newTickersFound = false;
+    articles.forEach(article => {
+        const text = (article.title + " " + article.summary).toLowerCase();
+        for (const [keyword, data] of Object.entries(COMPANY_MAP)) {
+            if (text.includes(keyword)) {
+                const exists = marketData.some(m => m.symbol === data.symbol);
+                if (!exists) {
+                    marketData.push({
+                        symbol: data.symbol,
+                        name: data.name,
+                        price: Math.floor(Math.random() * 500) + 100,
+                        change: (Math.random() * 4) - 2,
+                        prevPrice: 0 
+                    });
+                    newTickersFound = true;
+                }
+            }
+        }
+    });
+    if (newTickersFound) renderMarketWatch();
 }
 
-// --- NEWS LOGIC (UPDATED WITH GUARDIAN) ---
-async function loadNewsFeed() {
-    const guardianKey = localStorage.getItem('nexus_key_guardian');
-    const gnewsKey = localStorage.getItem('nexus_key_gnews');
-    const newsApiKey = localStorage.getItem('nexus_key_newsapi');
-
-    let success = false;
-
-    // PRIORITY 1: THE GUARDIAN (Best for Browsers)
-    if (guardianKey && !success) {
-        success = await fetchGuardian(guardianKey);
-        if(!success) pushAlert("Guardian API Failed", "Check key or quota. Trying next source...", "error");
-    }
-    
-    // PRIORITY 2: GNEWS
-    if (gnewsKey && !success) {
-        success = await fetchGNews(gnewsKey);
-        if(!success) pushAlert("GNews API Failed", "Check key or quota. Trying next source...", "error");
-    }
-
-    // PRIORITY 3: NEWSAPI (Often blocked by CORS in browser)
-    if (newsApiKey && !success) {
-        success = await fetchNewsAPI(newsApiKey);
-        if(!success) pushAlert("NewsAPI Failed", "Likely blocked by browser (CORS). Use Guardian or GNews.", "error");
-    }
-
-    // FALLBACK
-    if (!success) {
-        console.log("Using backup feed (Verified Links).");
-        if(guardianKey || gnewsKey || newsApiKey) {
-             pushAlert("System Offline", "All API connections failed. Displaying cached/backup intel.", "neutral");
-        } else {
-             pushAlert("Welcome", "No API keys configured. Running in simulation mode.", "neutral");
+function renderMarketWatch() {
+    const container = document.getElementById('marketWatchList');
+    container.innerHTML = marketData.map(item => {
+        const isPositive = item.change >= 0;
+        const changeClass = isPositive ? 'val-up' : 'val-down';
+        const icon = isPositive ? 'arrow-up-right' : 'arrow-down-right';
+        let flashClass = '';
+        if(item.prevPrice !== 0) {
+            if(item.price > item.prevPrice) flashClass = 'flash-up';
+            if(item.price < item.prevPrice) flashClass = 'flash-down';
         }
-        renderFeed(curatedNews);
-        updateBrief(curatedNews);
-        scanNewsForTickers(curatedNews); 
+        
+        return `
+        <div class="market-item ${flashClass}">
+            <div>
+                <div class="ticker-symbol">${item.symbol}</div>
+                <div class="ticker-name">${item.name}</div>
+            </div>
+            <div class="ticker-data">
+                <div class="ticker-price">${item.price.toFixed(2)}</div>
+                <div class="ticker-change ${changeClass}">
+                    <i data-lucide="${icon}" style="width:12px;"></i> ${Math.abs(item.change).toFixed(2)}%
+                </div>
+            </div>
+        </div>
+    `}).join('');
+    lucide.createIcons();
+}
+
+async function updateMarketData() {
+    const apiKey = localStorage.getItem('nexus_key_finnhub'); 
+    
+    if (apiKey) {
+        const symbolsToFetch = marketData.slice(0, 3).map(m => m.symbol);
+        for (let sym of symbolsToFetch) {
+             try {
+                const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${apiKey}`);
+                const data = await res.json();
+                if(data.c) {
+                    const stock = marketData.find(m => m.symbol === sym);
+                    stock.prevPrice = stock.price;
+                    stock.price = data.c;
+                    stock.change = data.dp;
+                }
+            } catch(e) { console.log("Finnhub error or rate limit"); }
+        }
+        renderMarketWatch();
+    } else {
+        marketData.forEach(item => {
+            item.prevPrice = item.price;
+            const volatility = 0.003; 
+            const change = (Math.random() - 0.5) * volatility * item.price;
+            item.price += change;
+            item.change = ((item.price - item.prevPrice) / item.prevPrice) * 100; 
+        });
         renderMarketWatch();
     }
 }
 
-async function fetchGuardian(apiKey) {
-    try {
-        const query = "artificial intelligence OR nvidia OR openai OR data center";
-        const url = `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}&show-fields=trailText,thumbnail&api-key=${apiKey}`;
-        
-        const res = await fetch(url);
-        if(!res.ok) throw new Error(res.status);
-        const data = await res.json();
-        
-        const articles = data.response.results.map((art, idx) => ({
-            id: idx + 300,
-            source: "The Guardian",
-            category: inferCategory(art.webTitle),
-            time: new Date(art.webPublicationDate).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-            title: art.webTitle,
-            summary: art.fields?.trailText || "No summary available",
-            implication: "Live Guardian Intel. Analysis pending...",
-            sentiment: "neu",
-            url: art.webUrl,
-            impact: 85
-        }));
-        
-        renderFeed(articles);
-        updateBrief(articles);
-        scanNewsForTickers(articles);
-        pushAlert("System Online", "Guardian feed established successfully.", "success");
-        return true;
-    } catch(e) {
-        console.error("Guardian Error:", e);
-        return false;
+// --- NEWS LOGIC (UPDATED FOR GNEWS) ---
+async function loadNewsFeed() {
+    const gnewsKey = localStorage.getItem('nexus_key_gnews');
+    const newsApiKey = localStorage.getItem('nexus_key_newsapi');
+
+    if (gnewsKey) {
+        // PRIORITY 1: GNews
+        await fetchGNews(gnewsKey);
+    } else if (newsApiKey) { 
+        // PRIORITY 2: NewsAPI
+        await fetchNewsAPI(newsApiKey); 
+    } else {
+        // PRIORITY 3: Curated (Fallback)
+        console.log("Using backup feed (Verified Links).");
+        renderFeed(curatedNews);
+        updateBrief(curatedNews);
+        scanNewsForTickers(curatedNews); 
+        renderMarketWatch();
     }
 }
 
@@ -201,11 +258,13 @@ async function fetchGNews(apiKey) {
         const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=10&sortby=publishedAt&apikey=${apiKey}`;
         
         const response = await fetch(url);
+        // Check for 403/401 explicitly
         if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
         const data = await response.json();
 
         if (data.articles) {
-            const articles = data.articles.map((art, index) => ({
+            const normalizedArticles = data.articles.map((art, index) => ({
                 id: index + 200,
                 source: art.source.name,
                 category: inferCategory(art.title + " " + art.description),
@@ -218,27 +277,31 @@ async function fetchGNews(apiKey) {
                 impact: Math.floor(Math.random() * 30) + 70
             }));
 
-            renderFeed(articles);
-            updateBrief(articles);
-            scanNewsForTickers(articles);
-            pushAlert("System Online", "GNews feed established successfully.", "success");
-            return true;
+            renderFeed(normalizedArticles);
+            updateBrief(normalizedArticles);
+            scanNewsForTickers(normalizedArticles);
+        } else {
+            console.warn("GNews No Articles:", data);
+            renderFeed(curatedNews); // Fallback
         }
-        return false;
     } catch (e) {
         console.error("GNews Fetch Failed:", e);
-        return false;
+        renderFeed(curatedNews); // Fallback
     }
 }
 
 async function fetchNewsAPI(apiKey) {
     try {
+        // Note: NewsAPI dev plan blocks requests from browsers (CORS). This often causes 401/403/Cors errors.
+        // We handle this by falling back.
         const response = await fetch(`https://newsapi.org/v2/everything?q="Artificial Intelligence" OR "Data Center" OR "AI Policy"&sortBy=publishedAt&language=en&apiKey=${apiKey}`);
+        
         if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
         const data = await response.json();
 
         if(data.status === 'ok') {
-            const articles = data.articles.slice(0, 20).map((art, index) => ({
+            const realArticles = data.articles.slice(0, 20).map((art, index) => ({
                 id: index + 100,
                 source: art.source.name,
                 category: inferCategory(art.title + " " + art.description),
@@ -251,16 +314,16 @@ async function fetchNewsAPI(apiKey) {
                 impact: Math.floor(Math.random() * 30) + 70 
             }));
             
-            renderFeed(articles);
-            updateBrief(articles);
-            scanNewsForTickers(articles);
-            pushAlert("System Online", "NewsAPI feed established successfully.", "success");
-            return true;
+            renderFeed(realArticles);
+            updateBrief(realArticles);
+            scanNewsForTickers(realArticles);
+        } else {
+            console.warn("NewsAPI Error:", data.message);
+            renderFeed(curatedNews); 
         }
-        return false;
     } catch (e) {
-        console.error("NewsAPI Error:", e);
-        return false;
+        console.error("NewsAPI Fetch Failed (Likely CORS or Key):", e);
+        renderFeed(curatedNews); 
     }
 }
 
@@ -275,6 +338,8 @@ function inferCategory(text) {
 function renderFeed(data) {
     const container = document.getElementById('feedContainer');
     const sortedData = [...data].sort((a, b) => b.impact - a.impact);
+
+    // Apply Grid View if active
     const isGrid = document.body.classList.contains('grid-layout');
     container.className = isGrid ? 'grid-view-active' : '';
 
@@ -285,8 +350,11 @@ function renderFeed(data) {
         return 'var(--accent-green)';
     };
 
+    const getSentimentClass = (sent) => sent === 'pos' ? 'sentiment-pos' : sent === 'neg' ? 'sentiment-neg' : 'sentiment-neu';
+    const isSentimentActive = document.getElementById('sentimentToggle')?.classList.contains('active');
+
     container.innerHTML = sortedData.map(item => `
-        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="feed-card">
+        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="feed-card ${isSentimentActive ? getSentimentClass(item.sentiment) : ''}">
             <div class="feed-viz" style="background:${getColor(item.category)}"></div>
             <div class="feed-main">
                 <div class="feed-top">
@@ -321,6 +389,7 @@ function filterFeed(category, el) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     if(el) el.classList.add('active');
     
+    // Simple DOM filtering to avoid re-fetching
     const cards = document.querySelectorAll('.feed-card');
     cards.forEach(card => {
         const catTag = card.querySelector('.feed-cat-tag').innerText;
@@ -353,85 +422,24 @@ function renderStartups(data) {
                     <span class="data-label">Sector</span>
                     <span class="data-value" style="color:var(--accent-blue)">${s.sector}</span>
                 </div>
+                 <div class="data-point">
+                    <span class="data-label">Deal Velocity</span>
+                    <div style="height:12px; display:flex; align-items:end; gap:2px; margin-top:2px;">
+                        <div style="width:4px; height:4px; background:var(--accent-orange); opacity:${s.velocity === 'low' ? 0.3 : 1}"></div>
+                        <div style="width:4px; height:8px; background:var(--accent-orange); opacity:${s.velocity === 'low' ? 0.3 : 1}"></div>
+                        <div style="width:4px; height:12px; background:var(--accent-orange); opacity:${s.velocity === 'high' ? 1 : 0.3}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phase-track-mini">
+                 <span class="phase-label">STAGE</span>
+                <div class="phase-seg filled"></div>
+                <div class="phase-seg ${s.stage !== 'Stealth' ? 'filled' : ''}"></div>
+                <div class="phase-seg ${s.stage === 'Growth' || s.stage === 'Series A' || s.stage === 'Series B' ? 'filled' : ''}"></div>
+                <div class="phase-seg ${s.stage === 'Growth' || s.stage === 'Series B' ? 'filled' : ''}"></div>
             </div>
         </div>
     `).join('');
-}
-
-// --- MARKET LOGIC & UTILS ---
-function scanNewsForTickers(articles) {
-    let newTickersFound = false;
-    articles.forEach(article => {
-        const text = (article.title + " " + article.summary).toLowerCase();
-        for (const [keyword, data] of Object.entries(COMPANY_MAP)) {
-            if (text.includes(keyword)) {
-                const exists = marketData.some(m => m.symbol === data.symbol);
-                if (!exists) {
-                    marketData.push({
-                        symbol: data.symbol,
-                        name: data.name,
-                        price: Math.floor(Math.random() * 500) + 100,
-                        change: (Math.random() * 4) - 2,
-                        prevPrice: 0 
-                    });
-                    newTickersFound = true;
-                }
-            }
-        }
-    });
-    if (newTickersFound) renderMarketWatch();
-}
-
-function renderMarketWatch() {
-    const container = document.getElementById('marketWatchList');
-    container.innerHTML = marketData.map(item => {
-        const isPositive = item.change >= 0;
-        const changeClass = isPositive ? 'val-up' : 'val-down';
-        const icon = isPositive ? 'arrow-up-right' : 'arrow-down-right';
-        return `
-        <div class="market-item">
-            <div>
-                <div class="ticker-symbol">${item.symbol}</div>
-                <div class="ticker-name">${item.name}</div>
-            </div>
-            <div class="ticker-data">
-                <div class="ticker-price">${item.price.toFixed(2)}</div>
-                <div class="ticker-change ${changeClass}">
-                    <i data-lucide="${icon}" style="width:12px;"></i> ${Math.abs(item.change).toFixed(2)}%
-                </div>
-            </div>
-        </div>
-    `}).join('');
-    lucide.createIcons();
-}
-
-async function updateMarketData() {
-    const apiKey = localStorage.getItem('nexus_key_finnhub'); 
-    
-    if (apiKey) {
-        const symbolsToFetch = marketData.slice(0, 3).map(m => m.symbol);
-        for (let sym of symbolsToFetch) {
-             try {
-                const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${apiKey}`);
-                const data = await res.json();
-                if(data.c) {
-                    const stock = marketData.find(m => m.symbol === sym);
-                    stock.prevPrice = stock.price;
-                    stock.price = data.c;
-                    stock.change = data.dp;
-                }
-            } catch(e) { console.log("Finnhub error/limit"); }
-        }
-    } else {
-        marketData.forEach(item => {
-            item.prevPrice = item.price;
-            const volatility = 0.003; 
-            const change = (Math.random() - 0.5) * volatility * item.price;
-            item.price += change;
-            item.change = ((item.price - item.prevPrice) / item.prevPrice) * 100; 
-        });
-    }
-    renderMarketWatch();
 }
 
 // --- SYSTEM UTILS ---
@@ -441,50 +449,82 @@ function toggleAutoRefresh() {
     btn.classList.toggle('active');
     
     if (btn.classList.contains('active')) {
-        refreshInterval = setInterval(() => { loadNewsFeed(); }, 30000);
+        refreshInterval = setInterval(() => {
+            loadNewsFeed();
+        }, 30000);
     } else {
         clearInterval(refreshInterval);
     }
 }
 
+// --- LAYOUT & THEME TOGGLES ---
 function toggleCyberpunk() {
+    // Manually remove Light Mode if active to prevent conflicts
+    document.body.classList.remove('light-mode');
+    document.getElementById('lightModeToggle').classList.remove('active');
+
     document.body.classList.toggle('cyberpunk-mode');
     document.getElementById('cyberpunkToggle').classList.toggle('active');
+    
+    const logo = document.querySelector('.logo-text');
+    logo.innerHTML = document.body.classList.contains('cyberpunk-mode') 
+        ? "NEXUS_INTEL <span style='font-size:0.8em;opacity:0.5'>v7.0</span>"
+        : "NEXUS INTEL <span style='font-size:0.8em;opacity:0.5'>v7.0</span>";
 }
+
 function toggleLightMode() {
+    // Manually remove Cyberpunk if active
+    document.body.classList.remove('cyberpunk-mode');
+    document.getElementById('cyberpunkToggle').classList.remove('active');
+
     document.body.classList.toggle('light-mode');
     document.getElementById('lightModeToggle').classList.toggle('active');
 }
+
 function toggleGridLayout() {
     document.body.classList.toggle('grid-layout');
+    const isGrid = document.body.classList.contains('grid-layout');
     document.getElementById('gridLayoutToggle').classList.toggle('active');
+    
+    // Save Preference
+    localStorage.setItem('nexus_layout_pref', isGrid ? 'grid' : 'list');
+    
+    // Re-render to apply class to container
     const container = document.getElementById('feedContainer');
-    container.className = document.body.classList.contains('grid-layout') ? 'grid-view-active' : '';
+    container.className = isGrid ? 'grid-view-active' : '';
 }
+
 function toggleZenMode() {
     document.body.classList.toggle('zen-mode');
+    document.getElementById('zenToggle').classList.toggle('active');
+    if(window.network) setTimeout(() => window.network.fit(), 500);
 }
+
 function toggleSentimentOverlay() {
     document.getElementById('sentimentToggle').classList.toggle('active');
+    // Force re-render of whatever is currently visible
     loadNewsFeed();
 }
+
 function toggleSettings() {
     document.getElementById('settingsModal').classList.toggle('active');
 }
+
 function toggleAlerts() {
     document.getElementById('alertsModal').classList.toggle('active');
-    document.getElementById('alertDot').style.display = 'none';
 }
+
 function toggleTLDR() {
     document.getElementById('tldrToggle').classList.toggle('active');
     document.querySelectorAll('.ai-pill').forEach(p => p.style.display = p.style.display === 'none' ? 'inline-flex' : 'none');
 }
 
 function saveSettings() {
-    localStorage.setItem('nexus_key_guardian', document.getElementById('key-guardian').value); // NEW
     localStorage.setItem('nexus_key_newsapi', document.getElementById('key-newsapi').value);
     localStorage.setItem('nexus_key_gnews', document.getElementById('key-gnews').value);
     localStorage.setItem('nexus_key_finnhub', document.getElementById('key-finnhub').value);
+    localStorage.setItem('nexus_key_openai', document.getElementById('key-openai').value);
+    localStorage.setItem('nexus_key_gemini', document.getElementById('key-gemini').value);
     
     loadNewsFeed();
     updateMarketData();
@@ -492,17 +532,22 @@ function saveSettings() {
 }
 
 function loadSettings() {
-    if(localStorage.getItem('nexus_key_guardian')) document.getElementById('key-guardian').value = localStorage.getItem('nexus_key_guardian');
+    // Load Keys
     if(localStorage.getItem('nexus_key_newsapi')) document.getElementById('key-newsapi').value = localStorage.getItem('nexus_key_newsapi');
     if(localStorage.getItem('nexus_key_gnews')) document.getElementById('key-gnews').value = localStorage.getItem('nexus_key_gnews');
     if(localStorage.getItem('nexus_key_finnhub')) document.getElementById('key-finnhub').value = localStorage.getItem('nexus_key_finnhub');
+    if(localStorage.getItem('nexus_key_openai')) document.getElementById('key-openai').value = localStorage.getItem('nexus_key_openai');
+    if(localStorage.getItem('nexus_key_gemini')) document.getElementById('key-gemini').value = localStorage.getItem('nexus_key_gemini');
 
-    if (localStorage.getItem('nexus_layout_pref') === 'grid') {
+    // Load Layout Pref
+    const layout = localStorage.getItem('nexus_layout_pref');
+    if (layout === 'grid') {
         document.body.classList.add('grid-layout');
         document.getElementById('gridLayoutToggle').classList.add('active');
     }
 }
 
+// --- VIEW LOGIC ---
 function switchView(viewName) {
     document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
     document.getElementById(`${viewName}View`).classList.add('active');
@@ -513,16 +558,21 @@ function switchView(viewName) {
     if (viewName === 'heatmap') setTimeout(initHeatMap, 100);
 }
 
+// --- MAP & GRAPH ---
 function initMap() {
     const map = L.map('miniMap', { zoomControl:false, attributionControl:false }).setView([20, 0], 1);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+    
     globalIntel.forEach(item => {
         let coords = [0,0];
         if(item.region === 'US') coords = [38, -97];
         if(item.region === 'EU') coords = [48, 12];
         if(item.region === 'CN') coords = [35, 104];
         if(item.region === 'UAE') coords = [23, 54];
-        L.circleMarker(coords, {color: '#0095ff', fillColor: '#0095ff', fillOpacity: 0.6, radius: 5}).bindTooltip(item.event).addTo(map);
+        
+        L.circleMarker(coords, {
+            color: '#0095ff', fillColor: '#0095ff', fillOpacity: 0.6, radius: 5
+        }).bindTooltip(item.event).addTo(map);
     });
 }
 
@@ -530,9 +580,10 @@ function initGraph() {
     const container = document.getElementById('knowledgeGraph');
     const nodes = new vis.DataSet([
         {id: 1, label: 'SSI', group: 'startup'}, {id: 2, label: 'DeepSeek', group: 'startup'},
-        {id: 3, label: 'Hardware', group: 'sector'}, {id: 4, label: 'a16z', group: 'vc'}
+        {id: 3, label: 'Hardware', group: 'sector'}, {id: 4, label: 'a16z', group: 'vc'},
+        {id: 5, label: 'Physical Intelligence', group: 'startup'}
     ]);
-    const edges = new vis.DataSet([{from: 1, to: 4}, {from: 2, to: 3}]);
+    const edges = new vis.DataSet([{from: 1, to: 4}, {from: 2, to: 3}, {from: 5, to: 4}]);
     window.network = new vis.Network(container, {nodes, edges}, {
         nodes: { shape: 'dot', font: {color:'#fff'} },
         groups: { startup:{color:'#0095ff'}, vc:{color:'#00ff9d'}, sector:{color:'#8a2be2'} }
@@ -548,12 +599,16 @@ function startClock() {
 
 function handleSearch(query) {
     const lowerQ = query.toLowerCase();
-    const filteredNews = curatedNews.filter(n => n.title.toLowerCase().includes(lowerQ));
+    const filteredNews = curatedNews.filter(n => n.title.toLowerCase().includes(lowerQ) || n.summary.toLowerCase().includes(lowerQ));
     renderFeed(filteredNews);
+    
+    const filteredStartups = startups.filter(s => s.name.toLowerCase().includes(lowerQ) || s.ticker.toLowerCase().includes(lowerQ));
+    renderStartups(filteredStartups);
 }
 
 function renderGlobalIntel() {
-    document.getElementById('globalIntelList').innerHTML = globalIntel.map(item => `
+    const list = document.getElementById('globalIntelList');
+    list.innerHTML = globalIntel.map(item => `
         <div class="intel-item">
             <span class="intel-region">${item.region}</span>
             <span class="intel-event">${item.event}</span>
@@ -564,15 +619,30 @@ function renderGlobalIntel() {
 function initImpactChart() {
     const options = {
         chart: { type: 'donut', height: 200, background: 'transparent' },
-        series: [44, 55, 13], labels: ['Hardware', 'Models', 'Apps'],
+        series: [44, 55, 13], // Hardware, Models, Apps
+        labels: ['Hardware', 'Models', 'Apps'],
         colors: ['#ff4757', '#0095ff', '#00ff9d'],
-        legend: { position: 'bottom', fontSize: '10px' },
+        plotOptions: { pie: { donut: { size: '70%', labels: { show: false } } } },
+        dataLabels: { enabled: false },
+        legend: { position: 'bottom', fontSize: '10px', markers: { width: 8, height: 8 } },
+        stroke: { show: true, width: 1, colors: ['#0f0f16'] },
         theme: { mode: 'dark' }
     };
     new ApexCharts(document.querySelector("#impactChart"), options).render();
 }
 
 function initHeatMap() {
-    // Basic placeholder for brevity, ensures no errors
-    document.querySelector("#heatMapContainer").innerHTML = "<div style='padding:20px; color:#666;'>Heatmap loading...</div>";
+     const options = {
+        series: [
+            { name: 'Hardware', data: [{ x: 'NVIDIA', y: 80 }, { x: 'AMD', y: 50 }, { x: 'Intel', y: 30 }] },
+            { name: 'Models', data: [{ x: 'OpenAI', y: 90 }, { x: 'Anthropic', y: 70 }, { x: 'Google', y: 60 }] },
+            { name: 'Apps', data: [{ x: 'Jasper', y: 20 }, { x: 'Midjourney', y: 40 }, { x: 'Character', y: 35 }] }
+        ],
+        chart: { height: '100%', type: 'treemap', background: 'transparent', toolbar: {show: false} },
+        colors: ['#ff4757', '#0095ff', '#00ff9d'],
+        plotOptions: { treemap: { distributed: true, enableShades: true } },
+        theme: { mode: 'dark' }
+    };
+    document.querySelector("#heatMapContainer").innerHTML = "";
+    new ApexCharts(document.querySelector("#heatMapContainer"), options).render();
 }

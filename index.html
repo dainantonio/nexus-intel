@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | V6.7</title>
+    <title>NEXUS INTEL | V6.8</title>
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,7 +22,7 @@
     <header class="app-header">
         <div class="logo-area">
             <div class="logo-icon"><i data-lucide="aperture"></i></div>
-            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v6.7</span></div>
+            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v6.8</span></div>
         </div>
 
         <div class="search-container">
@@ -117,7 +117,7 @@
                     <button class="nav-tab" onclick="switchView('graph')">Nexus Graph</button>
                     <button class="nav-tab" onclick="switchView('heatmap')">Heat Map</button>
                 </div>
-                </div>
+            </div>
 
             <div class="feed-controls">
                 <span class="filter-chip active" onclick="filterFeed('All', this)">All Sources</span>
@@ -202,6 +202,10 @@
                     <div class="setting-row">
                         <span style="font-size:0.9rem;">Light Mode</span>
                         <div class="toggle-switch" id="lightModeToggle" onclick="toggleLightMode()"></div>
+                    </div>
+                    <div class="setting-row">
+                        <span style="font-size:0.9rem;">Grid Layout</span>
+                        <div class="toggle-switch" id="gridLayoutToggle" onclick="toggleGridLayout()"></div>
                     </div>
                     <div class="setting-row">
                         <span style="font-size:0.9rem;">Sentiment Heatmap</span>

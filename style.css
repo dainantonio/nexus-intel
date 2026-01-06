@@ -33,6 +33,30 @@ body.cyberpunk-mode {
     --font-main: 'JetBrains Mono', monospace; 
 }
 
+/* LIGHT MODE OVERRIDES */
+body.light-mode {
+    --bg-dark: #f0f2f5;
+    --bg-card: #ffffff;
+    --bg-sidebar: #e4e7eb;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a5e;
+    --text-muted: #8a8a9a;
+    --border: #d1d5db;
+    --glass-border: rgba(0, 0, 0, 0.08);
+}
+body.light-mode .app-header {
+    background: rgba(240, 242, 245, 0.9);
+    border-bottom: 1px solid #d1d5db;
+}
+body.light-mode .search-input {
+    background: #fff;
+    border-color: #d1d5db;
+    color: #000;
+}
+body.light-mode .nav-tab.active {
+    color: #000;
+}
+
 body.cyberpunk-mode .app-container {
     background-image: 
         linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
@@ -346,14 +370,15 @@ a.feed-card.sentiment-neu { border-left: 4px solid var(--text-muted); }
 .action-btn.active { color: var(--accent-purple); }
 
 /* Spin Animation */
-.refresh-btn.active {
-    color: var(--accent-green);
-    background: rgba(0, 255, 157, 0.1);
-    border-color: rgba(0, 255, 157, 0.3);
+/* Updated to spin slowly by default */
+.refresh-btn i {
+    animation: spin 3s linear infinite;
 }
-.refresh-btn.active i {
+.refresh-btn:hover i, .refresh-btn.active i {
     animation: spin 1s linear infinite;
+    color: var(--accent-green);
 }
+
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* MAP */
@@ -440,7 +465,7 @@ body.cyberpunk-mode #miniMap { mix-blend-mode: normal; filter: contrast(1.2) hue
 .confidence-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
 .confidence-fill { height: 100%; background: var(--accent-blue); width: 94%; border-radius: 3px; box-shadow: 0 0 10px rgba(0, 149, 255, 0.3); }
 
-/* HIGHLIGHTED CLOCK */
+/* HIGHLIGHTED CLOCK - UPDATED FOR HEADER */
 #clock {
     color: var(--accent-green) !important;
     background: rgba(0, 255, 157, 0.05);

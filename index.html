@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | V6.8</title>
+    <title>NEXUS INTEL | V9.5 STABLE</title>
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
-
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="cyberpunk-mode">
+
+    <div class="toast-notification" id="toast">
+        <i data-lucide="alert-circle" style="color:var(--accent-red)"></i>
+        <div id="toastMessage">Error message here</div>
+        <i data-lucide="x" class="toast-close" onclick="hideToast()"></i>
+    </div>
 
     <header class="app-header">
         <div class="logo-area">
             <div class="logo-icon"><i data-lucide="aperture"></i></div>
-            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v6.8</span></div>
+            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v9.5</span></div>
         </div>
 
         <div class="search-container">
@@ -33,7 +40,7 @@
         <div style="display: flex; gap: 4px; align-items: center;">
             <div style="font-family:var(--font-mono); font-size:0.75rem; margin-right: 12px;" id="clock">00:00 UTC</div>
 
-            <button class="action-btn refresh-btn" id="refreshBtn" title="Continuous Refresh (30s)" onclick="toggleAutoRefresh()">
+            <button class="action-btn refresh-btn" id="refreshBtn" title="Refresh Now" onclick="manualRefresh()">
                 <i data-lucide="rotate-cw"></i>
             </button>
             <button class="action-btn zen-toggle" id="zenToggle" title="Zen Mode" onclick="toggleZenMode()">
@@ -61,11 +68,11 @@
         </div>
         <div class="confidence-bar-container">
             <div class="confidence-header">
-                <span>SYSTEM CONFIDENCE</span>
-                <span>94%</span>
+                <span id="systemStatus">SYSTEM ONLINE</span>
+                <span id="systemConfidence">94%</span>
             </div>
             <div class="confidence-track">
-                <div class="confidence-fill"></div>
+                <div class="confidence-fill" id="statusFill"></div>
             </div>
         </div>
     </div>
@@ -85,26 +92,23 @@
             <div>
                 <div class="sidebar-header"><i data-lucide="activity"></i> MARKET PULSE</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:4px;">
+                    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:var(--radius);">
                         <div style="font-size:0.65rem; color:var(--text-muted);">SENTIMENT</div>
                         <div style="color:var(--accent-green); font-family:var(--font-mono); font-weight:700;">BULLISH</div>
                     </div>
-                    <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:4px;">
+                    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:var(--radius);">
                         <div style="font-size:0.65rem; color:var(--text-muted);">SEED VOL</div>
                         <div style="color:var(--text-primary); font-family:var(--font-mono);">$4.2B</div>
                     </div>
-                </div>
-                <div style="margin-top:10px; height: 60px; background:rgba(255,255,255,0.03); border-radius:4px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.7rem;">
-                    [Market Trend Sparkline]
                 </div>
             </div>
             
             <div>
                  <div class="sidebar-header"><i data-lucide="hash"></i> ACTIVE VECTORS</div>
-                 <div style="display:flex; flex-direction:column; gap:6px;">
-                     <span style="font-size:0.8rem; color:var(--text-secondary);">#GenerativeBiology</span>
-                     <span style="font-size:0.8rem; color:var(--text-secondary);">#AgenticWorkflows</span>
-                     <span style="font-size:0.8rem; color:var(--text-secondary);">#SovereignCompute</span>
+                 <div style="display:flex; flex-direction:column; gap:8px;">
+                     <span class="vector-tag">#GenerativeBiology</span>
+                     <span class="vector-tag">#AgenticWorkflows</span>
+                     <span class="vector-tag">#SovereignCompute</span>
                  </div>
             </div>
         </aside>
@@ -124,6 +128,7 @@
                 <span class="filter-chip" onclick="filterFeed('Data Center', this)">Data Center</span>
                 <span class="filter-chip" onclick="filterFeed('AI', this)">AI</span>
                 <span class="filter-chip" onclick="filterFeed('Policy', this)">Policy</span>
+                <span class="filter-chip" onclick="filterFeed('Energy', this)">Energy</span>
                 
                 <div class="tldr-toggle" id="tldrToggle" onclick="toggleTLDR()">
                     <i data-lucide="zap" style="width:12px;"></i> AI SUMMARY
@@ -197,7 +202,7 @@
                     <div class="settings-section-title"><i data-lucide="monitor"></i> Interface</div>
                     <div class="setting-row">
                         <span style="font-size:0.9rem;">Cyberpunk Mode</span>
-                        <div class="toggle-switch" id="cyberpunkToggle" onclick="toggleCyberpunk()"></div>
+                        <div class="toggle-switch active" id="cyberpunkToggle" onclick="toggleCyberpunk()"></div>
                     </div>
                     <div class="setting-row">
                         <span style="font-size:0.9rem;">Light Mode</span>
@@ -211,34 +216,45 @@
                         <span style="font-size:0.9rem;">Sentiment Heatmap</span>
                         <div class="toggle-switch" id="sentimentToggle" onclick="toggleSentimentOverlay()"></div>
                     </div>
+                    <div class="setting-row">
+                        <span style="font-size:0.9rem;">Auto-Refresh (30s)</span>
+                        <div class="toggle-switch" id="autoRefreshToggle" onclick="toggleAutoRefresh()"></div>
+                    </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-section-title"><i data-lucide="rss"></i> Data Streams</div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">NewsAPI Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter NewsAPI key..." id="key-newsapi"></div>
-                    </div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">GNews API Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter GNews key..." id="key-gnews"></div>
-                    </div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">Finnhub API Key (Stock Ticker)</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter Finnhub key..." id="key-finnhub"></div>
-                    </div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">OpenAI API Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="sk-..." id="key-openai"></div>
-                    </div>
-                    <div class="api-input-group">
-                        <label class="api-input-label">Gemini API Key</label>
-                        <div class="api-input-wrapper"><input type="password" class="api-input" placeholder="Enter Gemini key..." id="key-gemini"></div>
+                    <div class="settings-section-title"><i data-lucide="rss"></i> Data Streams & AI</div>
+                    
+                    <div class="api-config-container">
+                        <label class="api-input-label">Select Provider to Configure</label>
+                        <select id="apiProviderSelector" class="api-select" onchange="updateApiConfigUI()">
+                            <option value="guardian">The Guardian (News)</option>
+                            <option value="gnews">GNews (News)</option>
+                            <option value="newsapi">NewsAPI (Simulation)</option>
+                            <option value="finnhub">Finnhub (Stocks)</option>
+                            <option value="gemini">Gemini (AI Analysis)</option>
+                        </select>
+
+                        <div id="apiConfigInputArea" class="mt-4">
+                            </div>
                     </div>
                 </div>
 
                 <button class="action-btn" style="width:100%; border-color:var(--accent-green); color:var(--accent-green); font-weight:600; height:40px;" onclick="saveSettings()">Save & Close</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="aiAnalysisModal" onclick="if(event.target === this) closeAiModal()">
+        <div class="settings-modal" style="width: 600px;">
+            <div class="modal-header">
+                <h3 style="font-size:1rem; font-weight:600; display:flex; gap:10px; align-items:center;">
+                    <i data-lucide="brain" style="color:var(--accent-purple)"></i> Tactical Analysis
+                </h3>
+                <button class="action-btn" onclick="closeAiModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body" id="aiModalContent">
+                </div>
         </div>
     </div>
 
@@ -250,7 +266,6 @@
                 </h3>
                 <button class="action-btn" onclick="toggleAlerts()"><i data-lucide="x"></i></button>
             </div>
-            
             <div class="modal-body">
                 <div class="alert-item">
                     <i data-lucide="alert-triangle" class="alert-icon"></i>
@@ -258,22 +273,6 @@
                         <h4>Volatility Spike Detected</h4>
                         <p>Market sentiment volatility index crossed 85. High probability of rapid price action in compute futures.</p>
                         <div class="alert-time">2 mins ago</div>
-                    </div>
-                </div>
-                <div class="alert-item">
-                    <i data-lucide="server" class="alert-icon" style="color:var(--accent-orange)"></i>
-                    <div class="alert-content">
-                        <h4>API Latency Warning</h4>
-                        <p>GNews data stream experiencing 400ms delay. Switching to redundant nodes.</p>
-                        <div class="alert-time">15 mins ago</div>
-                    </div>
-                </div>
-                 <div class="alert-item">
-                    <i data-lucide="shield-alert" class="alert-icon" style="color:var(--accent-blue)"></i>
-                    <div class="alert-content">
-                        <h4>New Policy Document</h4>
-                        <p>Nexus Crawler indexed "EU AI Act - Annex II" updates. Analysis pending.</p>
-                        <div class="alert-time">1 hour ago</div>
                     </div>
                 </div>
             </div>

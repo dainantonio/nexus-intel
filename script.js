@@ -1,3 +1,27 @@
+// --- CONFIGURATION & MAPPING ---
+// Map keywords in news to stock tickers
+const COMPANY_MAP = {
+    'nvidia': { symbol: 'NVDA', name: 'NVIDIA Corp' },
+    'microsoft': { symbol: 'MSFT', name: 'Microsoft' },
+    'openai': { symbol: 'MSFT', name: 'Microsoft (OpenAI)' }, // Proxy
+    'google': { symbol: 'GOOGL', name: 'Alphabet Inc' },
+    'gemini': { symbol: 'GOOGL', name: 'Alphabet Inc' },
+    'meta': { symbol: 'META', name: 'Meta Platforms' },
+    'llama': { symbol: 'META', name: 'Meta Platforms' },
+    'apple': { symbol: 'AAPL', name: 'Apple Inc' },
+    'amazon': { symbol: 'AMZN', name: 'Amazon.com' },
+    'aws': { symbol: 'AMZN', name: 'Amazon AWS' },
+    'amd': { symbol: 'AMD', name: 'Adv Micro Dev' },
+    'intel': { symbol: 'INTC', name: 'Intel Corp' },
+    'tsmc': { symbol: 'TSM', name: 'Taiwan Semi' },
+    'taiwan semi': { symbol: 'TSM', name: 'Taiwan Semi' },
+    'palantir': { symbol: 'PLTR', name: 'Palantir Tech' },
+    'oracle': { symbol: 'ORCL', name: 'Oracle Corp' },
+    'super micro': { symbol: 'SMCI', name: 'Super Micro' },
+    'tesla': { symbol: 'TSLA', name: 'Tesla Inc' },
+    'grok': { symbol: 'TSLA', name: 'Tesla (xAI)' }
+};
+
 // --- HIGH-SIGNAL CURATED STREAM (2026 CONTEXT) ---
 let curatedNews = [
     { 
@@ -113,24 +137,20 @@ const globalIntel = [
     { region: "UAE", event: "MGX Sovereign Fund Deployment" }
 ];
 
-// Market Data Tickers
+// Market Data Tickers - Initial Set
 let marketData = [
     { symbol: 'NVDA', name: 'NVIDIA Corp', price: 1145.20, change: 2.45, prevPrice: 1145.20 },
-    { symbol: 'MSFT', name: 'Microsoft', price: 420.15, change: 0.85, prevPrice: 420.15 },
     { symbol: 'PLTR', name: 'Palantir', price: 28.50, change: -1.20, prevPrice: 28.50 },
-    { symbol: 'AMD', name: 'Adv Micro Dev', price: 175.40, change: 1.10, prevPrice: 175.40 },
-    { symbol: 'AMZN', name: 'Amazon', price: 185.30, change: 0.50, prevPrice: 185.30 },
-    { symbol: 'TSM', name: 'Taiwan Semi', price: 160.00, change: -0.40, prevPrice: 160.00 }
+    // Others will be injected dynamically based on news
 ];
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     initMap();
-    loadNewsFeed();
+    loadNewsFeed(); // This now also triggers the market watch update
     renderStartups(startups);
     renderGlobalIntel();
-    renderMarketWatch();
     startClock();
     loadSettings();
     
@@ -141,17 +161,56 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateMarketData, 2000); // 2s tick
 });
 
-// --- MARKET WATCH LOGIC ---
+// --- DYNAMIC MARKET LOGIC ---
+
+// New function: Scans news and updates marketData
+function scanNewsForTickers(articles) {
+    let newTickersFound = false;
+
+    articles.forEach(article => {
+        // Combine title and summary for scanning
+        const text = (article.title + " " + article.summary).toLowerCase();
+
+        // Check against our map
+        for (const [keyword, data] of Object.entries(COMPANY_MAP)) {
+            if (text.includes(keyword)) {
+                // If found, check if it already exists in marketData
+                const exists = marketData.some(m => m.symbol === data.symbol);
+                
+                if (!exists) {
+                    // Add it with a mock starting price
+                    marketData.push({
+                        symbol: data.symbol,
+                        name: data.name,
+                        price: Math.floor(Math.random() * 500) + 100, // Random price 100-600
+                        change: (Math.random() * 4) - 2, // Random change -2% to +2%
+                        prevPrice: 0 // Will be set on next tick
+                    });
+                    newTickersFound = true;
+                }
+            }
+        }
+    });
+
+    if (newTickersFound) {
+        renderMarketWatch();
+    }
+}
+
 function renderMarketWatch() {
     const container = document.getElementById('marketWatchList');
+    // Sort slightly so "flashier" stocks don't jump around too much, or keep append order
+    
     container.innerHTML = marketData.map(item => {
         const isPositive = item.change >= 0;
         const changeClass = isPositive ? 'val-up' : 'val-down';
         const icon = isPositive ? 'arrow-up-right' : 'arrow-down-right';
-        // Add flash class logic if price changed
+        
         let flashClass = '';
-        if(item.price > item.prevPrice) flashClass = 'flash-up';
-        if(item.price < item.prevPrice) flashClass = 'flash-down';
+        if(item.prevPrice !== 0) {
+            if(item.price > item.prevPrice) flashClass = 'flash-up';
+            if(item.price < item.prevPrice) flashClass = 'flash-down';
+        }
         
         return `
         <div class="market-item ${flashClass}">
@@ -171,27 +230,31 @@ function renderMarketWatch() {
 }
 
 async function updateMarketData() {
-    const apiKey = localStorage.getItem('nexus_key_finnhub'); // Check for key
+    const apiKey = localStorage.getItem('nexus_key_finnhub'); 
     
     if (apiKey) {
-        // REAL DATA LOGIC (Simplified fetch for one symbol to demo)
-        // In production you'd batch request or iterate nicely
-        try {
-            const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=NVDA&token=${apiKey}`);
-            const data = await res.json();
-            if(data.c) {
-                const nvda = marketData.find(m => m.symbol === 'NVDA');
-                nvda.prevPrice = nvda.price;
-                nvda.price = data.c;
-                nvda.change = data.dp;
-                renderMarketWatch();
-            }
-        } catch(e) { console.log("Finnhub error"); }
+        // If user has key, try to fetch for all symbols
+        // Limiting to first 3 to avoid hitting free tier rate limits too hard
+        const symbolsToFetch = marketData.slice(0, 3).map(m => m.symbol);
+        
+        for (let sym of symbolsToFetch) {
+             try {
+                const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${apiKey}`);
+                const data = await res.json();
+                if(data.c) {
+                    const stock = marketData.find(m => m.symbol === sym);
+                    stock.prevPrice = stock.price;
+                    stock.price = data.c;
+                    stock.change = data.dp;
+                }
+            } catch(e) { console.log("Finnhub error"); }
+        }
+        renderMarketWatch();
     } else {
-        // SIMULATION LOGIC (Brownian Motion)
+        // SIMULATION LOGIC (Brownian Motion) for ALL stocks
         marketData.forEach(item => {
             item.prevPrice = item.price;
-            const volatility = 0.002; // 0.2% variance
+            const volatility = 0.003; // Slight volatility
             const change = (Math.random() - 0.5) * volatility * item.price;
             item.price += change;
             item.change = ((item.price - item.prevPrice) / item.prevPrice) * 100; 
@@ -208,12 +271,13 @@ async function loadNewsFeed() {
     } else {
        renderFeed(curatedNews);
        updateBrief(curatedNews);
+       scanNewsForTickers(curatedNews); // <--- Trigger Scan
+       renderMarketWatch(); // Ensure they appear
     }
 }
 
 async function fetchRealNews(apiKey) {
     try {
-        // Fetch relevant categories
         const response = await fetch(`https://newsapi.org/v2/everything?q="Artificial Intelligence" OR "Data Center" OR "AI Policy"&sortBy=publishedAt&language=en&apiKey=${apiKey}`);
         const data = await response.json();
 
@@ -226,26 +290,29 @@ async function fetchRealNews(apiKey) {
                 title: art.title,
                 summary: art.description || "No summary available.",
                 implication: "Live intel ingest. Auto-analysis pending...", 
-                sentiment: Math.random() > 0.5 ? 'pos' : 'neu', // Mock sentiment
+                sentiment: Math.random() > 0.5 ? 'pos' : 'neu', 
                 url: art.url,
-                impact: Math.floor(Math.random() * 30) + 70 // Mock impact
+                impact: Math.floor(Math.random() * 30) + 70 
             }));
             
-            curatedNews = realArticles; // Update global state
+            curatedNews = realArticles; 
             renderFeed(curatedNews);
             updateBrief(curatedNews);
+            scanNewsForTickers(curatedNews); // <--- Trigger Scan
         } else {
-            console.warn("NewsAPI Error (likely CORS or Limit):", data.message);
-            renderFeed(curatedNews); // Fallback
+            console.warn("NewsAPI Error:", data.message);
+            renderFeed(curatedNews); 
+            scanNewsForTickers(curatedNews);
         }
     } catch (e) {
-        console.error("Fetch failed (CORS likely):", e);
-        renderFeed(curatedNews); // Fallback
+        console.error("Fetch failed:", e);
+        renderFeed(curatedNews); 
+        scanNewsForTickers(curatedNews);
     }
 }
 
 function inferCategory(text) {
-    const t = text.toLowerCase();
+    const t = (text || "").toLowerCase();
     if (t.includes('data center') || t.includes('nvidia') || t.includes('chip') || t.includes('compute') || t.includes('cooling')) return "Data Center";
     if (t.includes('policy') || t.includes('regulation') || t.includes('law') || t.includes('ban') || t.includes('eu') || t.includes('congress')) return "Policy";
     return "AI";
@@ -290,19 +357,15 @@ function initHeatMap() {
         plotOptions: { treemap: { distributed: true, enableShades: true } },
         theme: { mode: 'dark' }
     };
-    // Clear previous if any
     document.querySelector("#heatMapContainer").innerHTML = "";
     new ApexCharts(document.querySelector("#heatMapContainer"), options).render();
 }
 
-// --- RENDER ---
+// --- RENDER FEED ---
 function renderFeed(data) {
     const container = document.getElementById('feedContainer');
-    
-    // Sort by Impact Score (Hidden Logic)
     const sortedData = [...data].sort((a, b) => b.impact - a.impact);
 
-    // Updated Color Logic for New Categories
     const getColor = (cat) => {
         if (cat === 'Data Center') return 'var(--accent-orange)';
         if (cat === 'AI') return 'var(--accent-blue)';
@@ -311,10 +374,8 @@ function renderFeed(data) {
     };
 
     const getSentimentClass = (sent) => sent === 'pos' ? 'sentiment-pos' : sent === 'neg' ? 'sentiment-neg' : 'sentiment-neu';
-    
     const isSentimentActive = document.getElementById('sentimentToggle')?.classList.contains('active');
 
-    // NEW: Render as <a> tags for robustness
     container.innerHTML = sortedData.map(item => `
         <a href="${item.url}" target="_blank" class="feed-card ${isSentimentActive ? getSentimentClass(item.sentiment) : ''}">
             <div class="feed-viz" style="background:${getColor(item.category)}"></div>
@@ -341,7 +402,6 @@ function updateBrief(data) {
     const secondItem = data.sort((a, b) => b.impact - a.impact)[1];
     
     if (topItem && secondItem) {
-        // Keep the static text for stability, but update bullet points
         document.getElementById('briefPoints').innerHTML = `
             <div class="brief-point"><i data-lucide="arrow-right"></i> <span>${topItem.implication}</span></div>
             <div class="brief-point"><i data-lucide="arrow-right"></i> <span>${secondItem.implication}</span></div>
@@ -411,14 +471,11 @@ function toggleAutoRefresh() {
     btn.classList.toggle('active');
     
     if (btn.classList.contains('active')) {
-        // Simulate refresh every 30s
         refreshInterval = setInterval(() => {
-            // Check API key again to see if we can do a real fetch
             const apiKey = localStorage.getItem('nexus_key_newsapi');
             if (apiKey) {
-                fetchRealNews(apiKey); // Real fetch
+                fetchRealNews(apiKey); 
             } else {
-                // Just shuffle logic to simulate liveliness if no key
                 const shuffled = [...curatedNews].sort(() => 0.5 - Math.random());
                 renderFeed(shuffled);
             }
@@ -431,8 +488,7 @@ function toggleAutoRefresh() {
 // --- THEME & UTILS ---
 function toggleCyberpunk() {
     document.body.classList.toggle('cyberpunk-mode');
-    const toggle = document.getElementById('cyberpunkToggle');
-    toggle.classList.toggle('active');
+    document.getElementById('cyberpunkToggle').classList.toggle('active');
     const logo = document.querySelector('.logo-text');
     logo.innerHTML = document.body.classList.contains('cyberpunk-mode') 
         ? "NEXUS_INTEL <span style='font-size:0.8em;opacity:0.5'>v6.6</span>"
@@ -474,9 +530,7 @@ function saveSettings() {
     btn.style.background = "var(--accent-green)";
     btn.style.color = "#000";
     
-    // Reload news immediately
     loadNewsFeed();
-    // Reload market watch immediately (if new key)
     updateMarketData();
     
     setTimeout(() => {
@@ -502,7 +556,6 @@ function switchView(viewName) {
     document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
     event.currentTarget.classList.add('active');
     
-    // Lazy load graphs
     if (viewName === 'graph' && !window.network) initGraph();
     if (viewName === 'heatmap') setTimeout(initHeatMap, 100);
 }
@@ -512,7 +565,6 @@ function initMap() {
     const map = L.map('miniMap', { zoomControl:false, attributionControl:false }).setView([20, 0], 1);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
     
-    // Add markers for intel
     globalIntel.forEach(item => {
         let coords = [0,0];
         if(item.region === 'US') coords = [38, -97];
@@ -538,6 +590,7 @@ function initGraph() {
         groups: { startup:{color:'#0095ff'}, vc:{color:'#00ff9d'}, sector:{color:'#8a2be2'} }
     });
 }
+
 function startClock() {
     setInterval(() => {
         const now = new Date();
@@ -545,7 +598,7 @@ function startClock() {
     }, 1000);
 }
 
- function handleSearch(query) {
+function handleSearch(query) {
     const lowerQ = query.toLowerCase();
     const filteredNews = curatedNews.filter(n => n.title.toLowerCase().includes(lowerQ) || n.summary.toLowerCase().includes(lowerQ));
     renderFeed(filteredNews);

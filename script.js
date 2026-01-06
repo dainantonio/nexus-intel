@@ -1,9 +1,8 @@
 // --- CONFIGURATION & MAPPING ---
-// Map keywords in news to stock tickers
 const COMPANY_MAP = {
     'nvidia': { symbol: 'NVDA', name: 'NVIDIA Corp' },
     'microsoft': { symbol: 'MSFT', name: 'Microsoft' },
-    'openai': { symbol: 'MSFT', name: 'Microsoft (OpenAI)' }, // Proxy
+    'openai': { symbol: 'MSFT', name: 'Microsoft (OpenAI)' },
     'google': { symbol: 'GOOGL', name: 'Alphabet Inc' },
     'gemini': { symbol: 'GOOGL', name: 'Alphabet Inc' },
     'meta': { symbol: 'META', name: 'Meta Platforms' },
@@ -14,15 +13,14 @@ const COMPANY_MAP = {
     'amd': { symbol: 'AMD', name: 'Adv Micro Dev' },
     'intel': { symbol: 'INTC', name: 'Intel Corp' },
     'tsmc': { symbol: 'TSM', name: 'Taiwan Semi' },
-    'taiwan semi': { symbol: 'TSM', name: 'Taiwan Semi' },
     'palantir': { symbol: 'PLTR', name: 'Palantir Tech' },
     'oracle': { symbol: 'ORCL', name: 'Oracle Corp' },
-    'super micro': { symbol: 'SMCI', name: 'Super Micro' },
     'tesla': { symbol: 'TSLA', name: 'Tesla Inc' },
     'grok': { symbol: 'TSLA', name: 'Tesla (xAI)' }
 };
 
-// --- HIGH-SIGNAL CURATED STREAM (2026 CONTEXT) ---
+// --- HIGH-SIGNAL CURATED STREAM ---
+// URLs updated to Search Queries to prevent 404s on fake articles
 let curatedNews = [
     { 
         id: 1, 
@@ -30,11 +28,11 @@ let curatedNews = [
         category: "AI", 
         time: "10m ago", 
         title: "Thinking Machines Lab secures historic $2B Seed.", 
-        summary: "The massive round sets a new precedent for seed-stage valuations. Mira Murati's new venture aims to build 'proprietary reasoning architectures' distinct from Transformer models.", 
+        summary: "The massive round sets a new precedent for seed-stage valuations. Mira Murati's new venture aims to build 'proprietary reasoning architectures'.", 
         implication: "Signifies a shift back to capital-intensive foundation model startups.", 
         sentiment: "pos", 
         impact: 95,
-        url: "https://www.theinformation.com/articles/thinking-machines-lab-raises-2b-seed-round-led-by-a16z" 
+        url: "https://www.google.com/search?q=Thinking+Machines+Lab+raises+2B+seed" 
     },
     { 
         id: 2, 
@@ -46,7 +44,7 @@ let curatedNews = [
         implication: "Expect inference costs to remain high; older H100 clusters retain value.", 
         sentiment: "neg", 
         impact: 98,
-        url: "https://www.bloomberg.com/news/articles/2026-05-12/nvidia-blackwell-ultra-shortages-expected-through-q3" 
+        url: "https://www.google.com/search?q=NVIDIA+Blackwell+Ultra+shortages" 
     },
     { 
         id: 3, 
@@ -55,10 +53,10 @@ let curatedNews = [
         time: "1h ago", 
         title: "EU AI Act enters full enforcement phase.", 
         summary: "Compliance deadlines for high-risk models are approaching faster than anticipated. Fines for non-compliance set at 7% of global turnover.", 
-        implication: "Open source models in EU may face geoblocking; Brussels Effect likely to influence US policy.", 
+        implication: "Open source models in EU may face geoblocking.", 
         sentiment: "neu", 
         impact: 88,
-        url: "https://www.reuters.com/technology/eu-ai-act-enters-full-enforcement-phase-2026-01-15/" 
+        url: "https://www.google.com/search?q=EU+AI+Act+enforcement+phase+2026" 
     },
     { 
         id: 4, 
@@ -66,11 +64,11 @@ let curatedNews = [
         category: "Data Center", 
         time: "2h ago", 
         title: "AWS Nuclear Power Deal Approved", 
-        summary: "Regulatory approval granted for direct-connect nuclear reactor for US-East-1 expansion. The 950MW deal creates a dedicated energy grid for AWS training clusters.", 
+        summary: "Regulatory approval granted for direct-connect nuclear reactor for US-East-1 expansion.", 
         implication: "Sovereign compute capabilities decoupling from public grid constraints.", 
         sentiment: "pos", 
         impact: 92,
-        url: "https://www.datacenterdynamics.com/en/news/aws-nuclear-deal-approved/" 
+        url: "https://www.google.com/search?q=AWS+Nuclear+Power+Deal+Approved" 
     },
     {
         id: 5,
@@ -78,11 +76,11 @@ let curatedNews = [
         category: "AI",
         time: "3h ago",
         title: "OpenAI 'Operator' enters widespread beta.",
-        summary: "The autonomous agent, capable of performing complex multi-step workflows across browsers, is now available to Enterprise tier users. Initial reports show 40% efficiency gains in procurement.",
-        implication: "Agentic workflows moving from theory to production; SaaS pricing models under threat.",
+        summary: "The autonomous agent, capable of performing complex multi-step workflows across browsers, is now available to Enterprise tier users.",
+        implication: "Agentic workflows moving from theory to production.",
         sentiment: "pos", 
         impact: 90,
-        url: "https://techcrunch.com/2026/01/22/openai-operator-beta-launch/"
+        url: "https://www.google.com/search?q=OpenAI+Operator+beta+launch"
     },
     {
         id: 6,
@@ -94,7 +92,7 @@ let curatedNews = [
         implication: "Generative Biology sector faces new geopolitical friction.", 
         sentiment: "neg", 
         impact: 85,
-        url: "https://www.ft.com/content/us-export-controls-bio-ai" 
+        url: "https://www.google.com/search?q=US+Expands+Export+Controls+Bio-AI" 
     },
     {
         id: 7,
@@ -106,7 +104,7 @@ let curatedNews = [
         implication: "Physical infrastructure adaptation is the next big VC thesis.", 
         sentiment: "pos", 
         impact: 75,
-        url: "https://venturebeat.com/ai/coolchip-raises-200m-series-b/" 
+        url: "https://www.google.com/search?q=Liquid+Cooling+startup+raises+200M" 
     },
     {
         id: 8,
@@ -118,7 +116,7 @@ let curatedNews = [
         implication: "Safety vs Capability debate shifting towards specific behavioral guarantees.", 
         sentiment: "neu", 
         impact: 80,
-        url: "https://www.theverge.com/2026/02/01/anthropic-constitution-2-0" 
+        url: "https://www.google.com/search?q=Anthropic+Constitution+2.0" 
     }
 ];
 
@@ -137,74 +135,58 @@ const globalIntel = [
     { region: "UAE", event: "MGX Sovereign Fund Deployment" }
 ];
 
-// Market Data Tickers - Initial Set
 let marketData = [
     { symbol: 'NVDA', name: 'NVIDIA Corp', price: 1145.20, change: 2.45, prevPrice: 1145.20 },
     { symbol: 'PLTR', name: 'Palantir', price: 28.50, change: -1.20, prevPrice: 28.50 },
-    // Others will be injected dynamically based on news
 ];
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     initMap();
-    loadNewsFeed(); // This now also triggers the market watch update
+    loadSettings(); // Loads keys AND layout preference
+    loadNewsFeed(); 
     renderStartups(startups);
     renderGlobalIntel();
     startClock();
-    loadSettings();
     
     // Initialize ApexCharts
     initImpactChart();
     
     // Start Ticker Loop
-    setInterval(updateMarketData, 2000); // 2s tick
+    setInterval(updateMarketData, 2000); 
 });
 
-// --- DYNAMIC MARKET LOGIC ---
-
-// New function: Scans news and updates marketData
+// --- MARKET LOGIC ---
 function scanNewsForTickers(articles) {
     let newTickersFound = false;
-
     articles.forEach(article => {
-        // Combine title and summary for scanning
         const text = (article.title + " " + article.summary).toLowerCase();
-
-        // Check against our map
         for (const [keyword, data] of Object.entries(COMPANY_MAP)) {
             if (text.includes(keyword)) {
-                // If found, check if it already exists in marketData
                 const exists = marketData.some(m => m.symbol === data.symbol);
-                
                 if (!exists) {
-                    // Add it with a mock starting price
                     marketData.push({
                         symbol: data.symbol,
                         name: data.name,
-                        price: Math.floor(Math.random() * 500) + 100, // Random price 100-600
-                        change: (Math.random() * 4) - 2, // Random change -2% to +2%
-                        prevPrice: 0 // Will be set on next tick
+                        price: Math.floor(Math.random() * 500) + 100,
+                        change: (Math.random() * 4) - 2,
+                        prevPrice: 0 
                     });
                     newTickersFound = true;
                 }
             }
         }
     });
-
-    if (newTickersFound) {
-        renderMarketWatch();
-    }
+    if (newTickersFound) renderMarketWatch();
 }
 
 function renderMarketWatch() {
     const container = document.getElementById('marketWatchList');
-    
     container.innerHTML = marketData.map(item => {
         const isPositive = item.change >= 0;
         const changeClass = isPositive ? 'val-up' : 'val-down';
         const icon = isPositive ? 'arrow-up-right' : 'arrow-down-right';
-        
         let flashClass = '';
         if(item.prevPrice !== 0) {
             if(item.price > item.prevPrice) flashClass = 'flash-up';
@@ -232,9 +214,7 @@ async function updateMarketData() {
     const apiKey = localStorage.getItem('nexus_key_finnhub'); 
     
     if (apiKey) {
-        // If user has key, try to fetch for all symbols
         const symbolsToFetch = marketData.slice(0, 3).map(m => m.symbol);
-        
         for (let sym of symbolsToFetch) {
              try {
                 const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${apiKey}`);
@@ -249,10 +229,9 @@ async function updateMarketData() {
         }
         renderMarketWatch();
     } else {
-        // SIMULATION LOGIC
         marketData.forEach(item => {
             item.prevPrice = item.price;
-            const volatility = 0.003; // Slight volatility
+            const volatility = 0.003; 
             const change = (Math.random() - 0.5) * volatility * item.price;
             item.price += change;
             item.change = ((item.price - item.prevPrice) / item.prevPrice) * 100; 
@@ -289,7 +268,7 @@ async function fetchRealNews(apiKey) {
                 summary: art.description || "No summary available.",
                 implication: "Live intel ingest. Auto-analysis pending...", 
                 sentiment: Math.random() > 0.5 ? 'pos' : 'neu', 
-                url: art.url, // Ensuring URL is passed correctly
+                url: art.url, 
                 impact: Math.floor(Math.random() * 30) + 70 
             }));
             
@@ -316,53 +295,14 @@ function inferCategory(text) {
     return "AI";
 }
 
-// --- GLOBAL INTEL RENDER ---
-function renderGlobalIntel() {
-    const list = document.getElementById('globalIntelList');
-    list.innerHTML = globalIntel.map(item => `
-        <div class="intel-item">
-            <span class="intel-region">${item.region}</span>
-            <span class="intel-event">${item.event}</span>
-        </div>
-    `).join('');
-}
-
-// --- APEX CHARTS ---
-function initImpactChart() {
-    const options = {
-        chart: { type: 'donut', height: 200, background: 'transparent' },
-        series: [44, 55, 13], // Hardware, Models, Apps
-        labels: ['Hardware', 'Models', 'Apps'],
-        colors: ['#ff4757', '#0095ff', '#00ff9d'],
-        plotOptions: { pie: { donut: { size: '70%', labels: { show: false } } } },
-        dataLabels: { enabled: false },
-        legend: { position: 'bottom', fontSize: '10px', markers: { width: 8, height: 8 } },
-        stroke: { show: true, width: 1, colors: ['#0f0f16'] },
-        theme: { mode: 'dark' }
-    };
-    new ApexCharts(document.querySelector("#impactChart"), options).render();
-}
-
-function initHeatMap() {
-     const options = {
-        series: [
-            { name: 'Hardware', data: [{ x: 'NVIDIA', y: 80 }, { x: 'AMD', y: 50 }, { x: 'Intel', y: 30 }] },
-            { name: 'Models', data: [{ x: 'OpenAI', y: 90 }, { x: 'Anthropic', y: 70 }, { x: 'Google', y: 60 }] },
-            { name: 'Apps', data: [{ x: 'Jasper', y: 20 }, { x: 'Midjourney', y: 40 }, { x: 'Character', y: 35 }] }
-        ],
-        chart: { height: '100%', type: 'treemap', background: 'transparent', toolbar: {show: false} },
-        colors: ['#ff4757', '#0095ff', '#00ff9d'],
-        plotOptions: { treemap: { distributed: true, enableShades: true } },
-        theme: { mode: 'dark' }
-    };
-    document.querySelector("#heatMapContainer").innerHTML = "";
-    new ApexCharts(document.querySelector("#heatMapContainer"), options).render();
-}
-
 // --- RENDER FEED ---
 function renderFeed(data) {
     const container = document.getElementById('feedContainer');
     const sortedData = [...data].sort((a, b) => b.impact - a.impact);
+
+    // Apply Grid View if active
+    const isGrid = document.body.classList.contains('grid-layout');
+    container.className = isGrid ? 'grid-view-active' : '';
 
     const getColor = (cat) => {
         if (cat === 'Data Center') return 'var(--accent-orange)';
@@ -394,7 +334,6 @@ function renderFeed(data) {
     lucide.createIcons();
 }
 
-// --- DYNAMIC BRIEF UPDATE ---
 function updateBrief(data) {
     const topItem = data.sort((a, b) => b.impact - a.impact)[0];
     const secondItem = data.sort((a, b) => b.impact - a.impact)[1];
@@ -429,9 +368,7 @@ function renderStartups(data) {
                 </div>
                 <div class="nexus-badge">NXS ${s.nexusScore}</div>
             </div>
-            
             <p class="card-desc">${s.desc}</p>
-            
             <div class="data-grid">
                 <div class="data-point">
                     <span class="data-label">Total Raised</span>
@@ -450,7 +387,6 @@ function renderStartups(data) {
                     </div>
                 </div>
             </div>
-
             <div class="phase-track-mini">
                  <span class="phase-label">STAGE</span>
                 <div class="phase-seg filled"></div>
@@ -462,7 +398,7 @@ function renderStartups(data) {
     `).join('');
 }
 
-// --- AUTO REFRESH ---
+// --- SYSTEM UTILS ---
 let refreshInterval = null;
 function toggleAutoRefresh() {
     const btn = document.getElementById('refreshBtn');
@@ -483,29 +419,40 @@ function toggleAutoRefresh() {
     }
 }
 
-// --- THEME & UTILS ---
+// --- LAYOUT & THEME TOGGLES ---
 function toggleCyberpunk() {
-    // Ensure Light Mode is off
-    if (document.body.classList.contains('light-mode')) {
-        toggleLightMode();
-    }
+    // Manually remove Light Mode if active to prevent conflicts
+    document.body.classList.remove('light-mode');
+    document.getElementById('lightModeToggle').classList.remove('active');
 
     document.body.classList.toggle('cyberpunk-mode');
     document.getElementById('cyberpunkToggle').classList.toggle('active');
+    
     const logo = document.querySelector('.logo-text');
     logo.innerHTML = document.body.classList.contains('cyberpunk-mode') 
-        ? "NEXUS_INTEL <span style='font-size:0.8em;opacity:0.5'>v6.7</span>"
-        : "NEXUS INTEL <span style='font-size:0.8em;opacity:0.5'>v6.7</span>";
+        ? "NEXUS_INTEL <span style='font-size:0.8em;opacity:0.5'>v6.8</span>"
+        : "NEXUS INTEL <span style='font-size:0.8em;opacity:0.5'>v6.8</span>";
 }
 
 function toggleLightMode() {
-    // Ensure Cyberpunk is off
-    if (document.body.classList.contains('cyberpunk-mode')) {
-        toggleCyberpunk();
-    }
+    // Manually remove Cyberpunk if active
+    document.body.classList.remove('cyberpunk-mode');
+    document.getElementById('cyberpunkToggle').classList.remove('active');
 
     document.body.classList.toggle('light-mode');
     document.getElementById('lightModeToggle').classList.toggle('active');
+}
+
+function toggleGridLayout() {
+    document.body.classList.toggle('grid-layout');
+    const isGrid = document.body.classList.contains('grid-layout');
+    document.getElementById('gridLayoutToggle').classList.toggle('active');
+    
+    // Save Preference
+    localStorage.setItem('nexus_layout_pref', isGrid ? 'grid' : 'list');
+    
+    // Re-render to apply class to container
+    renderFeed(curatedNews);
 }
 
 function toggleZenMode() {
@@ -539,20 +486,25 @@ function saveSettings() {
     localStorage.setItem('nexus_key_openai', document.getElementById('key-openai').value);
     localStorage.setItem('nexus_key_gemini', document.getElementById('key-gemini').value);
     
-    // Refresh Data
     loadNewsFeed();
     updateMarketData();
-    
-    // Close Modal immediately
     toggleSettings();
 }
 
 function loadSettings() {
+    // Load Keys
     if(localStorage.getItem('nexus_key_newsapi')) document.getElementById('key-newsapi').value = localStorage.getItem('nexus_key_newsapi');
     if(localStorage.getItem('nexus_key_gnews')) document.getElementById('key-gnews').value = localStorage.getItem('nexus_key_gnews');
     if(localStorage.getItem('nexus_key_finnhub')) document.getElementById('key-finnhub').value = localStorage.getItem('nexus_key_finnhub');
     if(localStorage.getItem('nexus_key_openai')) document.getElementById('key-openai').value = localStorage.getItem('nexus_key_openai');
     if(localStorage.getItem('nexus_key_gemini')) document.getElementById('key-gemini').value = localStorage.getItem('nexus_key_gemini');
+
+    // Load Layout Pref
+    const layout = localStorage.getItem('nexus_layout_pref');
+    if (layout === 'grid') {
+        document.body.classList.add('grid-layout');
+        document.getElementById('gridLayoutToggle').classList.add('active');
+    }
 }
 
 // --- VIEW LOGIC ---
@@ -610,4 +562,45 @@ function handleSearch(query) {
     renderFeed(filteredNews);
     const filteredStartups = startups.filter(s => s.name.toLowerCase().includes(lowerQ) || s.ticker.toLowerCase().includes(lowerQ));
     renderStartups(filteredStartups);
+}
+
+function renderGlobalIntel() {
+    const list = document.getElementById('globalIntelList');
+    list.innerHTML = globalIntel.map(item => `
+        <div class="intel-item">
+            <span class="intel-region">${item.region}</span>
+            <span class="intel-event">${item.event}</span>
+        </div>
+    `).join('');
+}
+
+function initImpactChart() {
+    const options = {
+        chart: { type: 'donut', height: 200, background: 'transparent' },
+        series: [44, 55, 13], // Hardware, Models, Apps
+        labels: ['Hardware', 'Models', 'Apps'],
+        colors: ['#ff4757', '#0095ff', '#00ff9d'],
+        plotOptions: { pie: { donut: { size: '70%', labels: { show: false } } } },
+        dataLabels: { enabled: false },
+        legend: { position: 'bottom', fontSize: '10px', markers: { width: 8, height: 8 } },
+        stroke: { show: true, width: 1, colors: ['#0f0f16'] },
+        theme: { mode: 'dark' }
+    };
+    new ApexCharts(document.querySelector("#impactChart"), options).render();
+}
+
+function initHeatMap() {
+     const options = {
+        series: [
+            { name: 'Hardware', data: [{ x: 'NVIDIA', y: 80 }, { x: 'AMD', y: 50 }, { x: 'Intel', y: 30 }] },
+            { name: 'Models', data: [{ x: 'OpenAI', y: 90 }, { x: 'Anthropic', y: 70 }, { x: 'Google', y: 60 }] },
+            { name: 'Apps', data: [{ x: 'Jasper', y: 20 }, { x: 'Midjourney', y: 40 }, { x: 'Character', y: 35 }] }
+        ],
+        chart: { height: '100%', type: 'treemap', background: 'transparent', toolbar: {show: false} },
+        colors: ['#ff4757', '#0095ff', '#00ff9d'],
+        plotOptions: { treemap: { distributed: true, enableShades: true } },
+        theme: { mode: 'dark' }
+    };
+    document.querySelector("#heatMapContainer").innerHTML = "";
+    new ApexCharts(document.querySelector("#heatMapContainer"), options).render();
 }

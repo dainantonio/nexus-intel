@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | V9.5 STABLE</title>
+    <title>NEXUS INTEL | V9.6</title>
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,15 +21,20 @@
 <body class="cyberpunk-mode">
 
     <div class="toast-notification" id="toast">
-        <i data-lucide="alert-circle" style="color:var(--accent-red)"></i>
-        <div id="toastMessage">Error message here</div>
+        <div class="toast-content">
+            <i data-lucide="activity" style="color:var(--accent-green)"></i>
+            <div class="toast-text-group">
+                <span class="toast-title">System Update</span>
+                <span id="toastMessage">Diagnostics: All Systems Nominal</span>
+            </div>
+        </div>
         <i data-lucide="x" class="toast-close" onclick="hideToast()"></i>
     </div>
 
     <header class="app-header">
         <div class="logo-area">
             <div class="logo-icon"><i data-lucide="aperture"></i></div>
-            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v9.5</span></div>
+            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v9.6</span></div>
         </div>
 
         <div class="search-container">
@@ -37,8 +42,8 @@
             <input type="text" class="search-input" id="globalSearch" placeholder="Command + K to search..." onkeyup="handleSearch(this.value)">
         </div>
 
-        <div style="display: flex; gap: 4px; align-items: center;">
-            <div style="font-family:var(--font-mono); font-size:0.75rem; margin-right: 12px;" id="clock">00:00 UTC</div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div id="clock">00:00 UTC</div>
 
             <button class="action-btn refresh-btn" id="refreshBtn" title="Refresh Now" onclick="manualRefresh()">
                 <i data-lucide="rotate-cw"></i>
@@ -62,21 +67,17 @@
     </div>
 
     <div class="intelligence-aggregator">
-        <div class="agg-group">
-            <div class="agg-label"><i data-lucide="shield-alert" style="width:12px; margin-right:6px; color:var(--accent-orange)"></i> Global Threat Level</div>
-            <div class="agg-data-row">
-                <span class="agg-value">MODERATE</span>
-                <span class="agg-sub">STABLE</span>
+        <div class="agg-section">
+            <div class="agg-label">GLOBAL THREAT LEVEL</div>
+            <div class="agg-main-display">
+                MODERATE <span class="status-pill stable">STABLE</span>
             </div>
         </div>
         
-        <div class="confidence-wrapper">
-            <div class="confidence-stats">
-                <span id="systemStatus">SYSTEM ONLINE</span>
-                <span id="systemConfidence">94%</span>
-            </div>
-            <div class="confidence-track">
-                <div class="confidence-fill" id="statusFill"></div>
+        <div class="agg-section right-align">
+            <div class="agg-label">MULTI-SOURCE LINKED</div>
+            <div class="agg-main-display">
+                <span style="color:var(--accent-blue)">94%</span> <span class="status-pill connected">ONLINE</span>
             </div>
         </div>
     </div>
@@ -84,34 +85,34 @@
     <div class="app-container">
         
         <aside class="left-sidebar">
-            <div>
+            <div class="sidebar-section">
                 <div class="sidebar-header"><i data-lucide="globe"></i> GLOBAL INTEL</div>
-                <div style="position:relative;">
+                <div class="map-wrapper">
                     <div id="miniMap"></div>
                     <div class="intel-list" id="globalIntelList"></div>
                 </div>
             </div>
 
-            <div>
+            <div class="sidebar-section">
                 <div class="sidebar-header"><i data-lucide="activity"></i> MARKET PULSE</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:var(--radius);">
-                        <div style="font-size:0.65rem; color:var(--text-muted);">SENTIMENT</div>
-                        <div style="color:var(--accent-green); font-family:var(--font-mono); font-weight:700;">BULLISH</div>
+                <div class="pulse-grid">
+                    <div class="pulse-card">
+                        <div class="pulse-label">SENTIMENT</div>
+                        <div class="pulse-value val-bullish">BULLISH</div>
                     </div>
-                    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:var(--radius);">
-                        <div style="font-size:0.65rem; color:var(--text-muted);">SEED VOL</div>
-                        <div style="color:var(--text-primary); font-family:var(--font-mono);">$4.2B</div>
+                    <div class="pulse-card">
+                        <div class="pulse-label">SEED VOL</div>
+                        <div class="pulse-value text-white">$4.2B</div>
                     </div>
                 </div>
             </div>
             
-            <div>
+            <div class="sidebar-section">
                  <div class="sidebar-header"><i data-lucide="hash"></i> ACTIVE VECTORS</div>
-                 <div style="display:flex; flex-direction:column; gap:8px;">
-                     <span class="vector-tag">#GenerativeBiology</span>
-                     <span class="vector-tag">#AgenticWorkflows</span>
-                     <span class="vector-tag">#SovereignCompute</span>
+                 <div class="vector-list">
+                     <div class="vector-tag">#GenerativeBiology</div>
+                     <div class="vector-tag">#AgenticWorkflows</div>
+                     <div class="vector-tag">#SovereignCompute</div>
                  </div>
             </div>
         </aside>
@@ -178,42 +179,41 @@
     <div class="modal-overlay" id="settingsModal" onclick="if(event.target === this) toggleSettings()">
         <div class="settings-modal">
             <div class="modal-header">
-                <h3 style="font-size:1rem; font-weight:600; display:flex; gap:10px; align-items:center;">
-                    <i data-lucide="settings"></i> System Configuration
-                </h3>
-                <button class="action-btn" onclick="toggleSettings()"><i data-lucide="x"></i></button>
+                <h3><i data-lucide="settings" style="width:18px;"></i> System Configuration</h3>
+                <i data-lucide="x" class="close-icon" onclick="toggleSettings()"></i>
             </div>
             
             <div class="modal-body">
-                <div class="settings-section">
-                    <div class="settings-section-title"><i data-lucide="monitor"></i> Interface</div>
+                <div class="settings-group">
+                    <div class="group-title"><i data-lucide="monitor" style="width:12px;"></i> INTERFACE</div>
+                    
                     <div class="setting-row">
-                        <span style="font-size:0.9rem;">Cyberpunk Mode</span>
+                        <span>Cyberpunk Mode</span>
                         <div class="toggle-switch active" id="cyberpunkToggle" onclick="toggleCyberpunk()"></div>
                     </div>
                     <div class="setting-row">
-                        <span style="font-size:0.9rem;">Light Mode</span>
+                        <span>Light Mode</span>
                         <div class="toggle-switch" id="lightModeToggle" onclick="toggleLightMode()"></div>
                     </div>
                     <div class="setting-row">
-                        <span style="font-size:0.9rem;">Grid Layout</span>
+                        <span>Grid Layout</span>
                         <div class="toggle-switch" id="gridLayoutToggle" onclick="toggleGridLayout()"></div>
                     </div>
                     <div class="setting-row">
-                        <span style="font-size:0.9rem;">Sentiment Heatmap</span>
+                        <span>Sentiment Heatmap</span>
                         <div class="toggle-switch" id="sentimentToggle" onclick="toggleSentimentOverlay()"></div>
                     </div>
                     <div class="setting-row">
-                        <span style="font-size:0.9rem;">Auto-Refresh (30s)</span>
+                        <span>Auto-Refresh (30s)</span>
                         <div class="toggle-switch" id="autoRefreshToggle" onclick="toggleAutoRefresh()"></div>
                     </div>
                 </div>
 
-                <div class="settings-section">
-                    <div class="settings-section-title"><i data-lucide="rss"></i> Data Streams & AI</div>
+                <div class="settings-group">
+                    <div class="group-title"><i data-lucide="rss" style="width:12px;"></i> DATA STREAMS & AI</div>
                     
-                    <div class="api-config-container">
-                        <label class="api-input-label">Select Provider to Configure</label>
+                    <div class="api-box">
+                        <label>Select Provider to Configure</label>
                         <select id="apiProviderSelector" class="api-select" onchange="updateApiConfigUI()">
                             <option value="guardian">The Guardian (News)</option>
                             <option value="gnews">GNews (News)</option>
@@ -222,12 +222,12 @@
                             <option value="gemini">Gemini (AI Analysis)</option>
                         </select>
 
-                        <div id="apiConfigInputArea" class="mt-4">
+                        <div id="apiConfigInputArea">
                             </div>
                     </div>
                 </div>
 
-                <button class="action-btn" style="width:100%; border-color:var(--accent-green); color:var(--accent-green); font-weight:600; height:40px;" onclick="saveSettings()">Save & Close</button>
+                <button class="save-btn" onclick="saveSettings()">Save & Close</button>
             </div>
         </div>
     </div>
@@ -235,12 +235,10 @@
     <div class="modal-overlay" id="aiAnalysisModal" onclick="if(event.target === this) closeAiModal()">
         <div class="settings-modal" style="width: 600px;">
             <div class="modal-header">
-                <h3 style="font-size:1rem; font-weight:600; display:flex; gap:10px; align-items:center;">
-                    <i data-lucide="brain" style="color:var(--accent-purple)"></i> Tactical Analysis
-                </h3>
-                <button class="action-btn" onclick="closeAiModal()"><i data-lucide="x"></i></button>
+                <h3><i data-lucide="brain" style="width:16px; color:var(--accent-purple)"></i> Tactical Analysis</h3>
+                <i data-lucide="x" class="close-icon" onclick="closeAiModal()"></i>
             </div>
-            <div class="modal-body" id="aiModalContent">
+            <div class="modal-body" id="aiModalContent" style="font-size: 0.95rem; line-height: 1.6;">
                 </div>
         </div>
     </div>
@@ -248,10 +246,8 @@
     <div class="modal-overlay" id="alertsModal" onclick="if(event.target === this) toggleAlerts()">
         <div class="settings-modal">
             <div class="modal-header">
-                <h3 style="font-size:1rem; font-weight:600; display:flex; gap:10px; align-items:center;">
-                    <i data-lucide="bell"></i> System Alerts
-                </h3>
-                <button class="action-btn" onclick="toggleAlerts()"><i data-lucide="x"></i></button>
+                <h3><i data-lucide="bell" style="width:16px;"></i> System Alerts</h3>
+                <i data-lucide="x" class="close-icon" onclick="toggleAlerts()"></i>
             </div>
             <div class="modal-body">
                 <div class="alert-item">

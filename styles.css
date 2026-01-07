@@ -188,6 +188,18 @@ body.zen-mode .main-feed { padding: 40px 10%; }
     margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;
 }
 
+/* RESTORED HIGHLIGHTED CLOCK STYLE */
+#clock {
+    color: var(--accent-green) !important;
+    background: rgba(0, 255, 157, 0.05);
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+    letter-spacing: 0.5px;
+}
+
 /* MARKET WATCH WIDGET */
 .market-list { display: flex; flex-direction: column; gap: 8px; }
 .market-item { 
@@ -217,7 +229,7 @@ body.zen-mode .main-feed { padding: 40px 10%; }
     overflow-y: auto;
     position: relative;
     display: flex; flex-direction: column;
-    padding: 0 1rem 1rem 1rem; /* Added horizontal padding */
+    padding: 0 1rem 1rem 1rem; 
 }
 
 .view-nav {
@@ -226,7 +238,7 @@ body.zen-mode .main-feed { padding: 40px 10%; }
     border-bottom: 1px solid var(--border);
     padding: 0.75rem 2rem;
     display: flex; justify-content: space-between; align-items: center;
-    margin: 0 -1rem; /* Extend to edges */
+    margin: 0 -1rem; 
 }
 body.light-mode .view-nav { background: rgba(255,255,255,0.95); }
 
@@ -283,6 +295,34 @@ body.light-mode .filter-chip { background: #fff; }
 }
 #heatMapContainer { background: var(--bg-card); padding: 10px; }
 body.light-mode #knowledgeGraph { background: radial-gradient(circle at center, #f0f2f5 0%, #ffffff 100%); }
+
+/* ===== GLOBAL INTEL LIST (SIDEBAR) ===== */
+.intel-list {
+    display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto;
+}
+.intel-item {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.75rem; padding: 8px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+.intel-item:hover {
+    background: rgba(255,255,255,0.03);
+    transform: translateX(4px);
+}
+body.cyberpunk-mode .intel-item { color: #fff; border-bottom-color: rgba(255,255,255,0.15); }
+body.light-mode .intel-item { color: var(--text-primary); border-bottom-color: rgba(0,0,0,0.1); }
+
+.intel-region { 
+    font-weight: 700; color: var(--accent-blue); width: 40px;
+    font-family: var(--font-mono);
+}
+.intel-event { 
+    flex: 1; color: var(--text-secondary); 
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+}
+body.cyberpunk-mode .intel-event { color: #fff; font-weight: 500; }
 
 /* ===== STARTUP CARDS ===== */
 .startup-grid { 
@@ -365,8 +405,8 @@ body.light-mode #knowledgeGraph { background: radial-gradient(circle at center, 
 .feed-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    padding: 0; /* Remove internal padding to control layout better */
-    margin-bottom: 2rem; /* Increased spacing between cards */
+    padding: 0; 
+    margin-bottom: 2rem; 
     border-radius: var(--radius);
     transition: all 0.3s ease;
     position: relative;
@@ -389,7 +429,7 @@ body.light-mode .feed-card:hover { background: #f9fafb; }
     color: inherit;
     display: flex;
     gap: 1.25rem;
-    padding: 1.5rem 1.5rem 0.5rem 1.5rem; /* Padding for the main content area */
+    padding: 1.5rem 1.5rem 0.5rem 1.5rem; 
     flex: 1;
 }
 
@@ -414,7 +454,7 @@ body.light-mode .feed-card:hover { background: #f9fafb; }
     border-radius: 4px;
 }
 .feed-title { 
-    font-size: 1.15rem; font-weight: 700; /* Increased size and weight */
+    font-size: 1.15rem; font-weight: 700; 
     color: var(--text-primary); line-height: 1.4;
     margin-bottom: 6px;
 }

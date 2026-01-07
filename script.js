@@ -83,7 +83,6 @@ async function analyzeArticle(title, summary) {
     if (!geminiKey) {
         showToast("Missing Gemini API Key. Please add it in Settings.");
         toggleSettings();
-        // Select Gemini in dropdown automatically for user convenience
         document.getElementById('apiProviderSelector').value = 'gemini';
         updateApiConfigUI();
         return;
@@ -107,7 +106,6 @@ async function analyzeArticle(title, summary) {
         Headline: ${title}
         Summary: ${summary}`;
 
-        // CORRECTED: Using the correct Gemini API endpoint and model
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${geminiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -123,14 +121,8 @@ async function analyzeArticle(title, summary) {
                     maxOutputTokens: 500,
                 },
                 safetySettings: [
-                    {
-                        category: "HARM_CATEGORY_HARASSMENT",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        category: "HARM_CATEGORY_HATE_SPEECH", 
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    }
+                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
                 ]
             })
         });
@@ -141,10 +133,7 @@ async function analyzeArticle(title, summary) {
 
         const data = await response.json();
         
-        if (data.error) {
-            throw new Error(data.error.message);
-        }
-        
+        if (data.error) throw new Error(data.error.message);
         if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
             throw new Error("Invalid response format from Gemini API");
         }
@@ -164,13 +153,6 @@ async function analyzeArticle(title, summary) {
             <div style="color:var(--accent-red); padding: 1rem;">
                 <h4>Analysis Protocol Failed</h4>
                 <p>${error.message}</p>
-                <p style="font-size:0.8rem; margin-top:8px;">
-                    <strong>Troubleshooting:</strong><br>
-                    1. Ensure your Gemini API key is valid<br>
-                    2. Try using gemini-1.0-pro or gemini-1.5-pro model<br>
-                    3. Check API usage limits<br>
-                    4. Verify network connectivity
-                </p>
                 <div style="margin-top:12px; padding:8px; background:rgba(255,255,255,0.05); border-radius:4px; font-size:0.8rem;">
                     <strong>Demo Analysis:</strong><br>
                     • <strong>Market Impact:</strong> Positive sentiment likely to drive investor interest in adjacent sectors.<br>
@@ -204,7 +186,6 @@ async function testGeminiAPI() {
         
         if (testResponse.ok) {
             showToast("API connection successful!");
-            console.log("Test response:", await testResponse.json());
         } else {
             showToast(`API Error: ${testResponse.status} ${testResponse.statusText}`);
         }
@@ -245,7 +226,7 @@ function resolveSmartLink(apiLink, htmlContent) {
     return finalLink;
 }
 
-// --- ENHANCED FEED RENDERER WITH AI BUTTON ---
+// --- ENHANCED FEED RENDERER WITH NEW LAYOUT ---
 function renderFeed(data) {
     const container = document.getElementById('feedContainer');
     const isGrid = document.body.classList.contains('grid-layout');
@@ -263,11 +244,9 @@ function renderFeed(data) {
     const isSentimentActive = document.getElementById('sentimentToggle')?.classList.contains('active');
 
     container.innerHTML = data.map(item => {
-        // Escape quotes for the function call
         const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         const safeSummary = item.summary.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
-        // Determine sentiment icon
         let sentimentIcon = 'circle';
         if (item.sentiment === 'pos') sentimentIcon = 'trending-up';
         if (item.sentiment === 'neg') sentimentIcon = 'trending-down';
@@ -275,7 +254,7 @@ function renderFeed(data) {
 
         return `
         <div class="feed-card ${isSentimentActive ? getSentimentClass(item.sentiment) : ''}">
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:inherit; flex:1; display: flex; gap: 1.25rem;">
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="feed-content-link">
                 <div class="feed-viz" style="background:${getColor(item.category)}"></div>
                 <div class="feed-main">
                     <div class="feed-top">
@@ -288,20 +267,24 @@ function renderFeed(data) {
                     </div>
                     <h3 class="feed-title">${item.title}</h3>
                     <p class="feed-body">${item.summary}</p>
-                    <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">
-                        <i data-lucide="bar-chart-3" style="width:12px; margin-right:4px;"></i> Impact: ${item.impact}/100
-                    </div>
                 </div>
             </a>
-            <div class="ai-summary-btn" onclick="analyzeArticle('${safeTitle}', '${safeSummary}')">
-                <i data-lucide="brain"></i> ANALYZE
+            
+            <div class="card-footer">
+                <div class="impact-score">
+                    <i data-lucide="bar-chart-3" style="width:14px;"></i> 
+                    <span style="font-weight:600;">IMPACT: ${item.impact}/100</span>
+                </div>
+                <div class="ai-summary-btn" onclick="analyzeArticle('${safeTitle}', '${safeSummary}')">
+                    <i data-lucide="brain" style="width:14px;"></i> ANALYZE
+                </div>
             </div>
         </div>
     `}).join('');
     lucide.createIcons();
 }
 
-// --- MAP LOGIC (CYBERPUNK FIX) ---
+// --- MAP LOGIC ---
 function initMap() {
     map = L.map('miniMap', { zoomControl:false, attributionControl:false }).setView([20, 0], 1);
     mapTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -382,7 +365,7 @@ function saveSettings() {
     if(provider === 'finnhub') localStorage.setItem('nexus_key_finnhub', document.getElementById('key-finnhub').value);
     if(provider === 'gemini') localStorage.setItem('nexus_key_gemini', document.getElementById('key-gemini').value);
     
-    localStorage.removeItem('nexus_gnews_cache'); // Clear cache on save
+    localStorage.removeItem('nexus_gnews_cache'); 
     loadNewsFeed();
     updateMarketData();
     toggleSettings();
@@ -466,7 +449,7 @@ function toggleAutoRefresh() {
     }
 }
 
-// --- AGGREGATOR FUNCTIONS (RESTORED) ---
+// --- AGGREGATOR FUNCTIONS ---
 async function loadNewsFeed() {
     const gnewsKey = localStorage.getItem('nexus_key_gnews');
     const guardianKey = localStorage.getItem('nexus_key_guardian');
@@ -488,7 +471,6 @@ async function loadNewsFeed() {
         if(res.status === 'fulfilled' && Array.isArray(res.value)) combinedArticles = combinedArticles.concat(res.value);
     });
 
-    // If no external articles, use curated ones
     if (combinedArticles.length === 0) {
         combinedArticles = curatedNews;
     }
@@ -505,7 +487,6 @@ async function loadNewsFeed() {
         document.getElementById('systemStatus').innerText = "MULTI-SOURCE LINKED";
         document.getElementById('statusFill').style.background = "var(--accent-green)";
         renderFeed(sortedArticles);
-        updateBrief(sortedArticles);
         scanNewsForTickers(sortedArticles);
     } else {
         renderFeed(curatedNews);
@@ -745,19 +726,6 @@ function initHeatMap() {
         theme: { mode: document.body.classList.contains('light-mode') ? 'light' : 'dark' }
     };
     new ApexCharts(el, options).render();
-}
-
-function updateBrief(data) {
-    const topItem = data[0];
-    const secondItem = data[1];
-    const briefPoints = document.getElementById('briefPoints');
-    if (briefPoints && topItem && secondItem) {
-        briefPoints.innerHTML = `
-            <div class="brief-point"><i data-lucide="arrow-right"></i> <span>${topItem.implication || topItem.title.substring(0,50)}...</span></div>
-            <div class="brief-point"><i data-lucide="arrow-right"></i> <span>${secondItem.implication || secondItem.title.substring(0,50)}...</span></div>
-        `;
-        lucide.createIcons();
-    }
 }
 
 function filterFeed(category, el) {

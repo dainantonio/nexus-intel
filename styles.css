@@ -567,3 +567,87 @@ body.light-mode .settings-modal { background: #fff; border-color: #d1d5db; color
     border: 1px solid rgba(0, 149, 255, 0.1);
     transition: all 0.2s;
 }
+
+/* ===== NEW INTELLIGENCE AGGREGATOR STYLES ===== */
+.intelligence-aggregator {
+    background: rgba(15, 15, 20, 0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(15px);
+}
+body.light-mode .intelligence-aggregator { background: rgba(255,255,255,0.95); border-bottom-color: #e5e7eb; }
+
+.agg-group { display: flex; flex-direction: column; gap: 4px; }
+
+.agg-label { 
+    font-size: 0.75rem; 
+    color: var(--text-muted); 
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    font-weight: 700; 
+    font-family: var(--font-mono);
+    display: flex; 
+    align-items: center;
+}
+
+.agg-data-row { display: flex; align-items: center; gap: 12px; }
+
+.agg-value { 
+    font-size: 1.5rem; 
+    font-weight: 800; 
+    color: #fff; 
+    letter-spacing: -0.5px; 
+    line-height: 1;
+}
+body.light-mode .agg-value { color: #111827; }
+
+.agg-sub { 
+    font-size: 0.7rem; 
+    color: var(--accent-green); 
+    font-weight: 700; 
+    background: rgba(0,255,157,0.1); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(0,255,157,0.1);
+}
+
+.confidence-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    min-width: 220px;
+}
+
+.confidence-stats {
+    display: flex;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+#systemStatus { color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+#systemConfidence { color: var(--accent-blue); text-shadow: 0 0 10px rgba(0,149,255,0.4); }
+
+.confidence-track { 
+    height: 4px; 
+    background: rgba(255,255,255,0.1); 
+    border-radius: 2px; 
+    overflow: hidden; 
+    width: 100%;
+}
+body.light-mode .confidence-track { background: #e5e7eb; }
+
+.confidence-fill { 
+    height: 100%; 
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); 
+    width: 94%; 
+    border-radius: 2px; 
+    box-shadow: 0 0 15px rgba(0, 149, 255, 0.5); 
+    transition: width 1s ease;
+}

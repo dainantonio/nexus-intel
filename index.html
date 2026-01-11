@@ -1,267 +1,607 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS INTEL | V9.6</title>
-    
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
-    
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+  Aperture, Search, PlayCircle, Bot, Maximize2, Minimize2, Mail, 
+  HelpCircle, Mic, Settings, Share2, History, Zap, Sparkles, 
+  List, Grid, RefreshCw, Activity, TrendingUp, TrendingDown, 
+  Loader2, X, Send, Download, AlertTriangle, Check, Volume2, MicOff
+} from 'lucide-react';
 
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body class="cyberpunk-mode">
+// --- STYLES & THEMES (Injected via JS for single-file portability) ---
+const CYBERPUNK_THEME = `
+  :root {
+    --bg-dark: #050507;
+    --bg-panel: rgba(14, 14, 18, 0.95);
+    --bg-card: rgba(21, 21, 27, 0.85);
+    --border-color: rgba(42, 42, 53, 0.6);
+    --neon-green: #00ff9d;
+    --neon-blue: #00f0ff;
+    --neon-red: #ff2a6d;
+    --neon-purple: #bc13fe;
+    --neon-amber: #ffb800;
+    --text-main: rgba(255, 255, 255, 0.95);
+    --text-muted: rgba(136, 136, 153, 0.8);
+    --font-mono: 'JetBrains Mono', monospace;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.36);
+  }
+  .theme-solarpunk {
+    --bg-dark: #f0f4f8; --bg-panel: rgba(255, 255, 255, 0.95); --bg-card: rgba(255, 255, 255, 0.85);
+    --border-color: rgba(0, 0, 0, 0.1); --neon-green: #059669; --neon-blue: #0284c7;
+    --neon-red: #dc2626; --text-main: #111827; --text-muted: #6b7280;
+  }
+  body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; }
+  .mono { font-family: var(--font-mono); }
+  .text-green { color: var(--neon-green); }
+  .text-red { color: var(--neon-red); }
+  .text-blue { color: var(--neon-blue); }
+  .text-purple { color: var(--neon-purple); }
+  .text-amber { color: var(--neon-amber); }
+  .glass-panel {
+    background: var(--bg-panel); border: 1px solid var(--border-color);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .scanline {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 51%);
+    background-size: 100% 6px; pointer-events: none; z-index: 999; opacity: 0.05;
+  }
+  .news-card {
+    background: var(--bg-card); border: 1px solid var(--border-color); border-left-width: 4px;
+    transition: all 0.3s ease;
+  }
+  .news-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-color: var(--neon-green); }
+  .btn-cyber {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-muted);
+    transition: all 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .btn-cyber:hover { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 15px rgba(0,255,157,0.2); }
+  
+  @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+  .animate-pulse-slow { animation: pulse 3s infinite ease-in-out; }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+  ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+`;
 
-    <div class="toast-notification" id="toast">
-        <div class="toast-content">
-            <i data-lucide="activity" style="color:var(--accent-green)"></i>
-            <div class="toast-text-group">
-                <span class="toast-title">System Update</span>
-                <span id="toastMessage">Diagnostics: All Systems Nominal</span>
-            </div>
+// --- SIMULATION DATA HELPERS ---
+const generateCandles = (basePrice) => {
+  let price = basePrice;
+  const data = [];
+  const now = Date.now();
+  for (let i = 30; i >= 0; i--) {
+    const time = now - (i * 24 * 60 * 60 * 1000);
+    const volatility = price * 0.05;
+    const change = (Math.random() - 0.5) * volatility;
+    const open = price;
+    const close = price + change;
+    const high = Math.max(open, close) + Math.random() * volatility * 0.5;
+    const low = Math.min(open, close) - Math.random() * volatility * 0.5;
+    data.push({ x: time, y: [open, high, low, close].map(n => parseFloat(n.toFixed(2))) });
+    price = close;
+  }
+  return data;
+};
+
+const MOCK_NEWS = [
+  { id: 1, headline: "Global Markets Brace for Impact as Tech Sector Adjusts", source: "NEXUS CORE", category: "TECH", time: "10:42 AM", sentiment: "bearish" },
+  { id: 2, headline: "Crypto Volatility Spikes: BTC Tests Key Resistance", source: "BLOCKCHAIN WIRE", category: "CRYPTO", time: "09:15 AM", sentiment: "bullish" },
+  { id: 3, headline: "Neural Link Integration: The Next Frontier?", source: "FUTURE WATCH", category: "AI", time: "08:30 AM", sentiment: "neutral" },
+  { id: 4, headline: "Fusion Reactor Breakthrough: Infinite Energy?", source: "GREEN TECH", category: "ENERGY", time: "Yesterday", sentiment: "bullish" },
+  { id: 5, headline: "New Privacy Laws Shake Up Silicon Valley", source: "GOV WIRE", category: "POLICY", time: "Yesterday", sentiment: "bearish" },
+];
+
+// --- COMPONENTS ---
+
+const SoundController = {
+  ctx: null,
+  init() {
+    if (!this.ctx && typeof window !== 'undefined') {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  },
+  playTone(freq, type, duration) {
+    if (!this.ctx) this.init();
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+    gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + duration);
+  },
+  click() { this.playTone(800, 'sine', 0.1); },
+  success() { this.playTone(600, 'sine', 0.1); setTimeout(() => this.playTone(1200, 'sine', 0.2), 100); },
+  error() { this.playTone(200, 'sawtooth', 0.2); setTimeout(() => this.playTone(150, 'sawtooth', 0.2), 150); },
+  hover() { this.playTone(400, 'sine', 0.05); }
+};
+
+const Header = ({ zenMode, toggleZen, toggleSettings, toggleOracle, startTour }) => {
+  const [time, setTime] = useState('');
+  
+  useEffect(() => {
+    const t = setInterval(() => {
+      setTime(new Date().toISOString().split('T')[1].split('.')[0] + " UTC");
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <header className="glass-panel flex items-center justify-between px-6 py-3 h-[64px] relative z-50 border-b border-white/10">
+      <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.location.reload()}>
+        <div className="w-9 h-9 bg-gradient-to-br from-[#00ff9d] to-[#00f0ff] rounded-lg flex items-center justify-center text-black shadow-[0_0_20px_rgba(0,255,157,0.3)] group-hover:rotate-12 transition-transform duration-300">
+          <Aperture size={20} />
         </div>
-        <i data-lucide="x" class="toast-close" onclick="hideToast()"></i>
-    </div>
-
-    <header class="app-header">
-        <div class="logo-area">
-            <div class="logo-icon"><i data-lucide="aperture"></i></div>
-            <div class="logo-text">NEXUS INTEL <span style="font-weight:400; opacity:0.5; font-size:0.8em;">v9.6</span></div>
+        <div className="font-bold text-xl tracking-tighter">
+          NEXUS <span className="text-green">INTEL</span> <span className="text-xs text-muted font-mono align-top ml-1">v9.4</span>
         </div>
+      </div>
 
-        <div class="search-container">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" class="search-input" id="globalSearch" placeholder="Command + K to search..." onkeyup="handleSearch(this.value)">
-        </div>
+      <div className="hidden md:flex items-center bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 w-80 transition-all focus-within:border-[#00ff9d] focus-within:shadow-[0_0_15px_rgba(0,255,157,0.2)]">
+        <Search size={16} className="text-muted mr-2" />
+        <input 
+          type="text" 
+          placeholder="SEARCH ASSET (e.g. NVDA)" 
+          className="bg-transparent border-none outline-none text-sm font-mono text-white w-full uppercase placeholder:text-gray-600"
+          onKeyDown={(e) => {
+            if(e.key === 'Enter') {
+              SoundController.success();
+              // In a real app, dispatch search action
+            }
+          }}
+        />
+      </div>
 
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <div id="clock">00:00 UTC</div>
-
-            <button class="action-btn refresh-btn" id="refreshBtn" title="Refresh Now" onclick="manualRefresh()">
-                <i data-lucide="rotate-cw"></i>
-            </button>
-            <button class="action-btn zen-toggle" id="zenToggle" title="Zen Mode" onclick="toggleZenMode()">
-                <i data-lucide="eye"></i>
-            </button>
-            <button class="action-btn" title="Settings" onclick="toggleSettings()"><i data-lucide="sliders-horizontal"></i></button>
-            <button class="action-btn" title="Alerts" onclick="toggleAlerts()"><i data-lucide="bell"></i></button>
-        </div>
+      <div className="flex items-center gap-2">
+        <div className="font-mono text-green text-sm mr-4 hidden lg:block">{time}</div>
+        <button className="btn-cyber w-9 h-9 rounded-md" onClick={toggleOracle} title="AI Oracle"><Bot size={18} /></button>
+        <button className="btn-cyber w-9 h-9 rounded-md" onClick={toggleZen} title="Zen Mode">
+          {zenMode ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+        </button>
+        <button className="btn-cyber w-9 h-9 rounded-md" onClick={startTour}><HelpCircle size={18} /></button>
+        <button className="btn-cyber w-9 h-9 rounded-md" onClick={toggleSettings}><Settings size={18} /></button>
+      </div>
     </header>
+  );
+};
 
-    <div class="signal-ticker">
-        <div class="ticker-content">
-            <div class="ticker-item">SSI RAISES $5B @ $15B VAL</div>
-            <div class="ticker-item">NVIDIA B200 SHIPPING Q2</div>
-            <div class="ticker-item">OPENAI "OPERATOR" RELEASED TO BETA</div>
-            <div class="ticker-item">ANTHROPIC PUBLISHES CONSTITUTION 2.0</div>
-            <div class="ticker-item">TSMC 2NM YIELDS EXCEED TARGET</div>
-        </div>
+const Ticker = ({ items }) => {
+  return (
+    <div className="glass-panel h-10 border-b border-white/10 overflow-hidden flex items-center relative z-40">
+      <div className="flex whitespace-nowrap animate-[marquee_40s_linear_infinite] hover:pause">
+        {[...items, ...items].map((item, i) => (
+          <div key={i} className="flex items-center gap-2 px-6 border-r border-white/10 font-mono text-xs cursor-pointer hover:bg-white/5 transition-colors">
+            <span className="text-muted font-bold">{item.symbol}</span>
+            <span className={item.change >= 0 ? "text-green" : "text-red"}>
+              {item.price.toFixed(2)} {item.change >= 0 ? "▲" : "▼"} {Math.abs(item.change)}%
+            </span>
+          </div>
+        ))}
+      </div>
+      <style>{`@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }`}</style>
     </div>
+  );
+};
 
-    <div class="intelligence-aggregator">
-        <div class="agg-section">
-            <div class="agg-label">GLOBAL THREAT LEVEL</div>
-            <div class="agg-main-display">
-                MODERATE <span class="status-pill stable">STABLE</span>
+const Portfolio = ({ cash, holdings, pnl, history, onOpenHistory }) => {
+  const totalValue = cash + holdings.reduce((acc, h) => acc + (h.qty * h.price), 0);
+  
+  return (
+    <div className="bg-black/20 border border-white/10 rounded-xl p-5 mb-6 border-l-4 border-l-[#00f0ff]">
+      <div className="flex justify-between items-center mb-3">
+        <span className="text-xs font-bold font-mono tracking-widest text-blue">QUANT ACCOUNT</span>
+        <button onClick={onOpenHistory} className="text-muted hover:text-white transition-colors"><History size={14} /></button>
+      </div>
+      <div className="text-2xl font-bold tracking-tight mb-1">${totalValue.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+      <div className={`text-sm font-mono font-bold mb-4 ${pnl >= 0 ? 'text-green' : 'text-red'}`}>
+        {pnl >= 0 ? '+' : ''}{pnl.toFixed(2)}% (ALL)
+      </div>
+      
+      <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-4">
+        <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 w-[45%] shadow-[0_0_10px_#00f0ff]"></div>
+      </div>
+      <div className="flex justify-between text-[10px] font-mono text-muted uppercase">
+        <span>Rank: Script Kiddie</span>
+        <span>LVL 3</span>
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
+        {holdings.length === 0 ? (
+          <div className="text-center text-xs text-muted py-2">NO POSITIONS</div>
+        ) : (
+          holdings.map((h, i) => (
+            <div key={i} className="flex justify-between text-xs font-mono">
+              <div><span className="font-bold text-white">{h.symbol}</span> <span className="text-muted">x{h.qty}</span></div>
+              <div className="text-green">+{(Math.random()*5).toFixed(2)}%</div>
             </div>
-        </div>
-        
-        <div class="agg-section right-align">
-            <div class="agg-label">MULTI-SOURCE LINKED</div>
-            <div class="agg-main-display">
-                <span style="color:var(--accent-blue)">94%</span> <span class="status-pill connected">ONLINE</span>
-            </div>
-        </div>
+          ))
+        )}
+      </div>
     </div>
+  );
+};
 
-    <div class="app-container">
+const NewsItem = ({ news, onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`news-card p-5 rounded-xl mb-4 cursor-pointer relative overflow-hidden group border-l-${news.sentiment === 'bullish' ? 'green' : news.sentiment === 'bearish' ? 'red' : 'gray'}-500`}
+    style={{ borderLeftColor: news.sentiment === 'bullish' ? '#00ff9d' : news.sentiment === 'bearish' ? '#ff2a6d' : '#888' }}
+  >
+    <div className="flex justify-between text-[10px] font-mono text-muted mb-2 tracking-wider">
+      <span>{news.source}</span>
+      <span>{news.time}</span>
+    </div>
+    <h4 className="font-bold text-sm mb-2 leading-snug group-hover:text-green transition-colors">{news.headline}</h4>
+    <div className="flex items-center gap-2 mt-3">
+      <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-muted font-mono">{news.category}</span>
+      <button className="ml-auto text-xs flex items-center gap-1 text-purple-400 hover:text-white transition-colors">
+        <Sparkles size={10} /> ANALYZE
+      </button>
+    </div>
+  </div>
+);
+
+const ChartComponent = ({ data }) => {
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    // Dynamically load ApexCharts to ensure runnable in environments without build steps
+    const script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/apexcharts";
+    script.async = true;
+    script.onload = () => {
+      if (window.ApexCharts && chartRef.current) {
+        const options = {
+          series: [{ data: data }],
+          chart: { type: 'candlestick', height: 280, background: 'transparent', toolbar: { show: false }, animations: { enabled: true } },
+          theme: { mode: 'dark' },
+          xaxis: { type: 'datetime', axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } },
+          yaxis: { tooltip: { enabled: true }, labels: { style: { colors: '#666', fontFamily: 'JetBrains Mono' } } },
+          grid: { borderColor: '#222', strokeDashArray: 4 },
+          plotOptions: { candlestick: { colors: { upward: '#00ff9d', downward: '#ff2a6d' } } }
+        };
+        const chart = new window.ApexCharts(chartRef.current, options);
+        chart.render();
+        return () => chart.destroy();
+      }
+    };
+    document.body.appendChild(script);
+  }, [data]);
+
+  return <div ref={chartRef} className="w-full h-[280px]" />;
+};
+
+const OrderBook = () => {
+  return (
+    <div className="mt-4 bg-black/20 border border-white/10 rounded-xl overflow-hidden">
+      <div className="flex justify-between px-3 py-2 bg-white/5 border-b border-white/10 text-[10px] font-mono font-bold text-muted">
+        <span>LEVEL 2</span>
+        <span className="text-green animate-pulse">LIVE</span>
+      </div>
+      <div className="p-1 space-y-[1px]">
+        {[...Array(5)].map((_, i) => (
+          <div key={`ask-${i}`} className="flex justify-between px-2 py-0.5 text-[10px] font-mono text-red relative">
+            <div className="absolute top-0 right-0 h-full bg-red-500/10 z-0" style={{width: `${Math.random() * 80}%`}}></div>
+            <span className="z-10 relative">{(152.50 + (i*0.1)).toFixed(2)}</span>
+            <span className="z-10 relative text-muted">{Math.floor(Math.random()*500)}</span>
+          </div>
+        ))}
+        <div className="py-1 border-y border-white/5 text-center text-sm font-bold text-white font-mono">152.45</div>
+        {[...Array(5)].map((_, i) => (
+          <div key={`bid-${i}`} className="flex justify-between px-2 py-0.5 text-[10px] font-mono text-green relative">
+            <div className="absolute top-0 left-0 h-full bg-green-500/10 z-0" style={{width: `${Math.random() * 80}%`}}></div>
+            <span className="z-10 relative">{(152.40 - (i*0.1)).toFixed(2)}</span>
+            <span className="z-10 relative text-muted">{Math.floor(Math.random()*500)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Modal = ({ title, isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="bg-[#15151b] border border-white/10 rounded-xl w-full max-w-md shadow-2xl animate-[fadeIn_0.2s_ease-out]">
+        <div className="flex justify-between items-center p-4 border-b border-white/10">
+          <h3 className="font-mono text-green font-bold flex items-center gap-2">{title}</h3>
+          <button onClick={onClose} className="text-muted hover:text-white"><X size={18} /></button>
+        </div>
+        <div className="p-4 max-h-[70vh] overflow-y-auto">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN APP COMPONENT ---
+
+export default function NexusTerminal() {
+  const [theme, setTheme] = useState('theme-cyberpunk');
+  const [zenMode, setZenMode] = useState(false);
+  const [activeSymbol, setActiveSymbol] = useState('NVDA');
+  const [chartData, setChartData] = useState([]);
+  const [holdings, setHoldings] = useState([{ symbol: 'BTC', qty: 0.5, price: 42000 }]);
+  const [cash, setCash] = useState(100000);
+  const [history, setHistory] = useState([]);
+  
+  // Modals state
+  const [modals, setModals] = useState({ settings: false, history: false, oracle: false });
+  
+  // Audio
+  const [audioEnabled, setAudioEnabled] = useState(true);
+
+  useEffect(() => {
+    // Initial data load simulation
+    setChartData(generateCandles(150));
+    // Ticker loop would go here
+  }, [activeSymbol]);
+
+  const handleBuy = () => {
+    if (audioEnabled) SoundController.click();
+    if (cash > 1500) { // Sim price
+      setCash(c => c - 1524.50); // 10 units approx
+      setHoldings(prev => {
+        const existing = prev.find(h => h.symbol === activeSymbol);
+        if (existing) {
+          return prev.map(h => h.symbol === activeSymbol ? {...h, qty: h.qty + 10} : h);
+        }
+        return [...prev, { symbol: activeSymbol, qty: 10, price: 152.45 }];
+      });
+      SoundController.success();
+    } else {
+      SoundController.error();
+    }
+  };
+
+  const handleSell = () => {
+    if (audioEnabled) SoundController.click();
+    const holding = holdings.find(h => h.symbol === activeSymbol);
+    if (holding && holding.qty >= 10) {
+      setCash(c => c + 1524.50);
+      setHoldings(prev => prev.map(h => h.symbol === activeSymbol ? {...h, qty: h.qty - 10} : h).filter(h => h.qty > 0));
+      SoundController.success();
+    } else {
+      SoundController.error();
+    }
+  };
+
+  return (
+    <div className={`min-h-screen text-sm select-none ${theme}`}>
+      <style>{CYBERPUNK_THEME}</style>
+      <div className="scanline"></div>
+
+      {/* Boot Sequence Overlay could go here */}
+
+      <Header 
+        zenMode={zenMode} 
+        toggleZen={() => setZenMode(!zenMode)}
+        toggleSettings={() => setModals(m => ({...m, settings: true}))}
+        toggleOracle={() => setModals(m => ({...m, oracle: true}))}
+        startTour={() => alert("System Tour Initiated...")}
+      />
+
+      <Ticker items={[
+        {symbol: "NVDA", price: 152.45, change: 2.3},
+        {symbol: "BTC", price: 64230.10, change: -1.2},
+        {symbol: "ETH", price: 3450.00, change: 0.5},
+        {symbol: "TSLA", price: 180.20, change: -0.8},
+        {symbol: "AAPL", price: 175.50, change: 0.1},
+        {symbol: "SOL", price: 145.20, change: 5.4}
+      ]} />
+
+      <main className={`grid transition-all duration-500 ease-in-out h-[calc(100vh-104px)] overflow-hidden
+        ${zenMode ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-[280px_1fr_320px]'}
+      `}>
         
-        <aside class="left-sidebar">
-            <div class="sidebar-section">
-                <div class="sidebar-header"><i data-lucide="globe"></i> GLOBAL INTEL</div>
-                <div class="map-wrapper">
-                    <div id="miniMap"></div>
-                    <div class="intel-list" id="globalIntelList"></div>
-                </div>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="sidebar-header"><i data-lucide="activity"></i> MARKET PULSE</div>
-                <div class="pulse-grid">
-                    <div class="pulse-card">
-                        <div class="pulse-label">SENTIMENT</div>
-                        <div class="pulse-value val-bullish">BULLISH</div>
-                    </div>
-                    <div class="pulse-card">
-                        <div class="pulse-label">SEED VOL</div>
-                        <div class="pulse-value text-white">$4.2B</div>
-                    </div>
-                </div>
-            </div>
+        {/* LEFT SIDEBAR */}
+        {!zenMode && (
+          <aside className="glass-panel border-r border-white/10 p-5 flex flex-col overflow-y-auto hidden lg:flex">
+            <Portfolio 
+              cash={cash} 
+              holdings={holdings} 
+              pnl={12.5} 
+              history={history}
+              onOpenHistory={() => setModals(m => ({...m, history: true}))}
+            />
             
-            <div class="sidebar-section">
-                 <div class="sidebar-header"><i data-lucide="hash"></i> ACTIVE VECTORS</div>
-                 <div class="vector-list">
-                     <div class="vector-tag">#GenerativeBiology</div>
-                     <div class="vector-tag">#AgenticWorkflows</div>
-                     <div class="vector-tag">#SovereignCompute</div>
+            <div className="mb-6">
+              <h3 className="text-xs font-bold text-muted mb-3 flex items-center gap-2">
+                <Activity size={12} /> WATCHLIST
+              </h3>
+              <div className="space-y-1">
+                {["NVDA", "AMD", "MSFT", "GOOGL"].map(sym => (
+                  <div key={sym} className="flex justify-between items-center p-2 rounded hover:bg-white/5 cursor-pointer group" onClick={() => { setActiveSymbol(sym); SoundController.click(); }}>
+                    <span className="font-mono font-bold group-hover:text-white transition-colors">{sym}</span>
+                    <div className="text-right">
+                      <div className="text-xs text-white">152.42</div>
+                      <div className="text-[10px] text-green">+1.2%</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-auto">
+              <h3 className="text-xs font-bold text-muted mb-2 flex items-center gap-2">
+                <Zap size={12} /> HEATMAP
+              </h3>
+              <div className="grid grid-cols-2 gap-1 h-32">
+                <div className="bg-green-500/20 border border-green-500/30 flex items-center justify-center text-xs font-bold text-green">TECH</div>
+                <div className="bg-red-500/20 border border-red-500/30 flex items-center justify-center text-xs font-bold text-red">ENER</div>
+                <div className="bg-green-500/10 border border-green-500/20 flex items-center justify-center text-xs font-bold text-green-400">FIN</div>
+                <div className="bg-green-500/40 border border-green-500/50 flex items-center justify-center text-xs font-bold text-white">CRYP</div>
+              </div>
+            </div>
+          </aside>
+        )}
+
+        {/* CENTER FEED */}
+        <section className={`bg-[#050507] p-6 overflow-y-auto scroll-smooth ${zenMode ? 'px-[15%]' : ''}`}>
+           {/* Briefing Panel */}
+           <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mb-6 backdrop-blur-md">
+             <div className="flex justify-between items-center mb-2">
+               <div className="flex items-center gap-2 text-amber-500 font-bold font-mono text-xs tracking-wider">
+                 <Zap size={14} /> DAILY INTELLIGENCE BRIEFING
+               </div>
+               <button className="text-[10px] bg-amber-500/10 text-amber-500 px-2 py-1 rounded border border-amber-500/20 hover:bg-amber-500 hover:text-black transition-colors flex items-center gap-1" onClick={() => SoundController.click()}>
+                 <Sparkles size={10} /> SYNTHESIZE
+               </button>
+             </div>
+             <p className="text-muted text-xs leading-relaxed font-mono">
+               Market volatility detected in Sector 7 due to quantum computing breakthrough rumors. Recommend rebalancing portfolio towards semiconductor assets.
+             </p>
+           </div>
+
+           <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10">
+             <h2 className="font-mono font-bold text-lg tracking-tight flex items-center gap-2">
+               <Activity size={18} className="text-green" /> INTELLIGENCE STREAM
+             </h2>
+             <div className="flex gap-2">
+                <button className="btn-cyber w-8 h-8 rounded"><List size={16} /></button>
+                <button className="btn-cyber w-8 h-8 rounded"><Grid size={16} /></button>
+                <button className="btn-cyber w-8 h-8 rounded" onClick={() => SoundController.click()}><RefreshCw size={16} /></button>
+             </div>
+           </div>
+
+           <div className="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar">
+             {["ALL", "CRYPTO", "TECH", "AI", "ENERGY", "POLICY"].map(filter => (
+               <button key={filter} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-muted hover:text-white hover:border-green-500/50 transition-all whitespace-nowrap">
+                 {filter}
+               </button>
+             ))}
+           </div>
+
+           <div className={zenMode ? "grid grid-cols-2 gap-4" : ""}>
+             {MOCK_NEWS.map(news => (
+               <NewsItem key={news.id} news={news} onClick={() => SoundController.click()} />
+             ))}
+           </div>
+        </section>
+
+        {/* RIGHT SIDEBAR */}
+        {!zenMode && (
+          <aside className="glass-panel border-l border-white/10 p-5 flex flex-col overflow-y-auto hidden md:flex">
+             <div className="mb-6">
+               <h3 className="text-xs font-bold text-muted mb-3 flex items-center gap-2">
+                 <Activity size={12} /> ASSET DIAGNOSTICS
+               </h3>
+               
+               {/* Bot Control */}
+               <div className="bg-purple-500/5 border border-purple-500/30 rounded-lg p-3 mb-4 flex items-center justify-between">
+                 <div className="flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"></div>
+                   <span className="text-[10px] font-bold text-purple-400 font-mono">GHOST BOT: STANDBY</span>
                  </div>
-            </div>
-        </aside>
+                 <div className="w-8 h-4 bg-white/10 rounded-full relative cursor-pointer">
+                    <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-gray-400 rounded-full transition-all"></div>
+                 </div>
+               </div>
 
-        <main class="main-feed">
-            <div class="view-nav">
-                <div class="nav-tabs">
-                    <button class="nav-tab active" onclick="switchView('feed')">Intel Feed</button>
-                    <button class="nav-tab" onclick="switchView('startups')">Seed Scout</button>
-                    <button class="nav-tab" onclick="switchView('graph')">Nexus Graph</button>
-                    <button class="nav-tab" onclick="switchView('heatmap')">Heat Map</button>
-                </div>
-            </div>
+               {/* Trade Controls */}
+               <div className="grid grid-cols-2 gap-2 mb-4">
+                 <button onClick={handleBuy} className="bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+                   <TrendingUp size={16} /> BUY
+                 </button>
+                 <button onClick={handleSell} className="bg-red-500 hover:bg-red-400 text-black font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+                   <TrendingDown size={16} /> SELL
+                 </button>
+               </div>
 
-            <div class="feed-controls">
-                <span class="filter-chip active" onclick="filterFeed('All', this)">All Sources</span>
-                <span class="filter-chip" onclick="filterFeed('Data Center', this)">Data Center</span>
-                <span class="filter-chip" onclick="filterFeed('AI', this)">AI</span>
-                <span class="filter-chip" onclick="filterFeed('Policy', this)">Policy</span>
-                <span class="filter-chip" onclick="filterFeed('Energy', this)">Energy</span>
-                
-                <div class="tldr-toggle" id="tldrToggle" onclick="toggleTLDR()">
-                    <i data-lucide="zap" style="width:12px;"></i> AI SUMMARY
-                </div>
-            </div>
+               <button className="w-full py-2 mb-4 border border-purple-500/50 text-purple-400 rounded-lg text-xs font-bold hover:bg-purple-500 hover:text-black transition-all flex items-center justify-center gap-2">
+                 <Sparkles size={12} /> GENERATE AI REPORT
+               </button>
 
-            <div id="feedView" class="view-container active">
-                <div id="feedContainer"></div>
-            </div>
+               {/* Chart Card */}
+               <div className="bg-[#15151b] border border-white/10 rounded-xl p-4 shadow-lg">
+                 <div className="flex justify-between items-end mb-4 border-b border-white/10 pb-2">
+                   <div>
+                     <div className="text-2xl font-bold tracking-tighter">{activeSymbol}</div>
+                     <div className="text-xs text-muted">NVIDIA Corp</div>
+                   </div>
+                   <div className="text-right">
+                     <div className="text-xl text-green font-mono font-bold">152.45</div>
+                     <div className="text-xs text-green">+2.45%</div>
+                   </div>
+                 </div>
+                 <ChartComponent data={chartData} />
+                 <OrderBook />
+               </div>
+             </div>
 
-            <div id="startupsView" class="view-container">
-                <div style="margin-bottom:1.5rem;">
-                    <h2 style="font-weight:600; font-size:1.2rem; margin-bottom:4px;">Deal Flow: Series Seed+</h2>
-                    <p style="color:var(--text-muted); font-size:0.85rem;">High-signal opportunities sorted by Nexus Score.</p>
-                </div>
-                <div class="startup-grid" id="startupGrid"></div>
-            </div>
+             <div className="grid grid-cols-2 gap-2 mt-auto">
+                {[{l:"MKT CAP", v:"2.4T"}, {l:"VOL", v:"45.2M"}, {l:"HIGH", v:"154.2"}, {l:"LOW", v:"149.8"}].map((s,i) => (
+                  <div key={i} className="bg-white/5 p-2 rounded border border-white/5">
+                    <div className="text-[10px] text-muted">{s.l}</div>
+                    <div className="text-sm font-bold font-mono text-green">{s.v}</div>
+                  </div>
+                ))}
+             </div>
+          </aside>
+        )}
+      </main>
 
-            <div id="graphView" class="view-container">
-                <div id="knowledgeGraph"></div>
-            </div>
-
-            <div id="heatmapView" class="view-container">
-                <h2 style="font-weight:600; font-size:1.2rem; margin-bottom:1rem;">Sector Performance Heatmap</h2>
-                <div id="heatMapContainer"></div>
-            </div>
-        </main>
-
-        <aside class="right-sidebar">
-            <div>
-                <div class="sidebar-header"><i data-lucide="trending-up"></i> MARKET WATCH</div>
-                <div class="market-list" id="marketWatchList">
-                    </div>
-            </div>
-
-            <div>
-                <div class="sidebar-header"><i data-lucide="pie-chart"></i> IMPACT DISTRIBUTION</div>
-                <div id="impactChart" style="min-height: 200px;"></div>
-            </div>
-        </aside>
-
-    </div>
-
-    <div class="modal-overlay" id="settingsModal" onclick="if(event.target === this) toggleSettings()">
-        <div class="settings-modal">
-            <div class="modal-header">
-                <h3><i data-lucide="settings" style="width:18px;"></i> System Configuration</h3>
-                <i data-lucide="x" class="close-icon" onclick="toggleSettings()"></i>
-            </div>
-            
-            <div class="modal-body">
-                <div class="settings-group">
-                    <div class="group-title"><i data-lucide="monitor" style="width:12px;"></i> INTERFACE</div>
-                    
-                    <div class="setting-row">
-                        <span>Cyberpunk Mode</span>
-                        <div class="toggle-switch active" id="cyberpunkToggle" onclick="toggleCyberpunk()"></div>
-                    </div>
-                    <div class="setting-row">
-                        <span>Light Mode</span>
-                        <div class="toggle-switch" id="lightModeToggle" onclick="toggleLightMode()"></div>
-                    </div>
-                    <div class="setting-row">
-                        <span>Grid Layout</span>
-                        <div class="toggle-switch" id="gridLayoutToggle" onclick="toggleGridLayout()"></div>
-                    </div>
-                    <div class="setting-row">
-                        <span>Sentiment Heatmap</span>
-                        <div class="toggle-switch" id="sentimentToggle" onclick="toggleSentimentOverlay()"></div>
-                    </div>
-                    <div class="setting-row">
-                        <span>Auto-Refresh (30s)</span>
-                        <div class="toggle-switch" id="autoRefreshToggle" onclick="toggleAutoRefresh()"></div>
-                    </div>
-                </div>
-
-                <div class="settings-group">
-                    <div class="group-title"><i data-lucide="rss" style="width:12px;"></i> DATA STREAMS & AI</div>
-                    
-                    <div class="api-box">
-                        <label>Select Provider to Configure</label>
-                        <select id="apiProviderSelector" class="api-select" onchange="updateApiConfigUI()">
-                            <option value="guardian">The Guardian (News)</option>
-                            <option value="gnews">GNews (News)</option>
-                            <option value="newsapi">NewsAPI (Simulation)</option>
-                            <option value="finnhub">Finnhub (Stocks)</option>
-                            <option value="gemini">Gemini (AI Analysis)</option>
-                        </select>
-
-                        <div id="apiConfigInputArea">
-                            </div>
-                    </div>
-                </div>
-
-                <button class="save-btn" onclick="saveSettings()">Save & Close</button>
-            </div>
+      {/* --- MODALS --- */}
+      
+      {/* Settings Modal */}
+      <Modal title="SYSTEM CONFIGURATION" isOpen={modals.settings} onClose={() => setModals(m => ({...m, settings: false}))}>
+        <div className="space-y-4 font-mono text-sm">
+           <div>
+             <label className="block text-muted text-xs mb-1">VISUAL THEME</label>
+             <select className="w-full bg-black/30 border border-white/20 p-2 rounded text-white outline-none" onChange={(e) => setTheme(e.target.value)} value={theme}>
+               <option value="theme-cyberpunk">CYBERPUNK (Default)</option>
+               <option value="theme-solarpunk">SOLARPUNK (Light)</option>
+             </select>
+           </div>
+           <div className="flex items-center justify-between p-2 bg-white/5 rounded">
+             <span>AUDIO & SFX</span>
+             <button onClick={() => setAudioEnabled(!audioEnabled)} className={`w-10 h-5 rounded-full relative ${audioEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
+                <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${audioEnabled ? 'left-5.5' : 'left-0.5'}`}></div>
+             </button>
+           </div>
+           <button onClick={() => window.location.reload()} className="w-full p-2 border border-red-500/50 text-red-500 rounded hover:bg-red-500 hover:text-white transition-colors">
+             REBOOT SYSTEM
+           </button>
         </div>
-    </div>
+      </Modal>
 
-    <div class="modal-overlay" id="aiAnalysisModal" onclick="if(event.target === this) closeAiModal()">
-        <div class="settings-modal" style="width: 600px;">
-            <div class="modal-header">
-                <h3><i data-lucide="brain" style="width:16px; color:var(--accent-purple)"></i> Tactical Analysis</h3>
-                <i data-lucide="x" class="close-icon" onclick="closeAiModal()"></i>
-            </div>
-            <div class="modal-body" id="aiModalContent" style="font-size: 0.95rem; line-height: 1.6;">
-                </div>
+      {/* Oracle Modal */}
+      <Modal title="NEXUS ORACLE" isOpen={modals.oracle} onClose={() => setModals(m => ({...m, oracle: false}))}>
+        <div className="h-64 bg-black/30 rounded p-4 mb-4 overflow-y-auto border border-white/10 font-mono text-sm space-y-3">
+          <div className="text-green">
+            <span className="opacity-50">SYS:</span> Connected to Gemini 2.5 Flash. Awaiting query...
+          </div>
         </div>
-    </div>
-
-    <div class="modal-overlay" id="alertsModal" onclick="if(event.target === this) toggleAlerts()">
-        <div class="settings-modal">
-            <div class="modal-header">
-                <h3><i data-lucide="bell" style="width:16px;"></i> System Alerts</h3>
-                <i data-lucide="x" class="close-icon" onclick="toggleAlerts()"></i>
-            </div>
-            <div class="modal-body">
-                <div class="alert-item">
-                    <i data-lucide="alert-triangle" class="alert-icon"></i>
-                    <div class="alert-content">
-                        <h4>Volatility Spike Detected</h4>
-                        <p>Market sentiment volatility index crossed 85. High probability of rapid price action in compute futures.</p>
-                        <div class="alert-time">2 mins ago</div>
-                    </div>
-                </div>
-            </div>
+        <div className="flex gap-2">
+          <input type="text" placeholder="Ask about markets..." className="flex-1 bg-white/5 border border-white/10 rounded p-2 text-white outline-none focus:border-green-500" />
+          <button className="bg-green-500 text-black p-2 rounded hover:bg-green-400"><Send size={18} /></button>
         </div>
-    </div>
+      </Modal>
 
-    <script src="script.js"></script>
-</body>
-</html>
+      {/* History Modal */}
+      <Modal title="TRADE LEDGER" isOpen={modals.history} onClose={() => setModals(m => ({...m, history: false}))}>
+        <div className="text-center text-muted text-xs py-8">NO TRANSACTIONS LOGGED</div>
+      </Modal>
+      
+      {/* Voice Control Floating Button */}
+      <div className="fixed bottom-6 left-6 z-50">
+        <button 
+          className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center text-black shadow-[0_0_30px_rgba(0,240,255,0.4)] hover:scale-110 transition-transform"
+          onClick={() => {
+            SoundController.click();
+            alert("Voice Control Module: Listening...");
+          }}
+        >
+          <Mic size={24} />
+        </button>
+      </div>
+
+    </div>
+  );
+}
